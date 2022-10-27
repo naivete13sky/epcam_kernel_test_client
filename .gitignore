@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#cc
+test_report/
+.idea
+config.xlsx
+~$config.xlsx
+my_config.json
