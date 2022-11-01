@@ -219,7 +219,8 @@ class Print():
     @staticmethod
     def print_with_delimiter(text,sign='*',numbers=200):
         pass
-        print(text.center( int(numbers) - len(text), '*'))
+        # print(text.center( int(numbers) - len(text.encode('utf-8')), '*'))
+        print(text.center(int(numbers) - len(text), '*'))
 
 
 
@@ -262,4 +263,6 @@ if __name__ == "__main__":
     print("我是main()")
     Print.print_with_delimiter("你好啊！")
     Print.print_with_delimiter("abc！")
+    Print.print_with_delimiter("a b c ！")
+    Print.print_with_delimiter("你好123，发生了什么事啊！")
 
