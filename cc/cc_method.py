@@ -14,12 +14,46 @@ base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, base_path)
 sys.path.insert(0, os.path.join(base_path,r'config_ep/epcam'))
 
+import tarfile as tf
+
+
+
 
 class GetTestData():
     pass
     def get_job_id(self,fun):
         pd_1=pd.read_excel(io=os.path.join(os.path.abspath('.'),r"config.xlsx"), sheet_name="test_data")
         return [ each2 for each1 in pd_1[(pd_1["测试功能"]==fun) & (pd_1["是否执行"] == 1)][['测试料号']].values.tolist() for each2 in each1]
+
+
+class CompressTool():
+    @staticmethod
+    def untgz(ifn, untgz_path):
+        """解压tgz文件到指定目录
+        :param     ifn(str):解压导入路径
+        :param     untgz_path(str):解压后存放路径
+        :returns   :None
+        :raises    error:
+        """
+        try:
+            ifn = ifn.split(sep='"')[1]
+        except:
+            pass
+        ofn = untgz_path
+        # with tf.open(ifn, 'r:gz') as tar:
+        tar = tf.open(ifn)
+        for tarinfo in tar:
+            if os.path.exists(os.path.join(ofn, tarinfo.name)):
+                for root, dirs, files in os.walk(os.path.join(ofn, tarinfo.name), topdown=False):
+                    for name in files:
+                        os.remove(os.path.join(root, name))
+                    for name in dirs:
+                        os.rmdir(os.path.join(root, name))
+            tar.extract(tarinfo.name, ofn)
+        print('uncompress success!')
+        return os.path.dirname(tarinfo.name)
+        # os.system('pause')
+        return
 
 
 class DMS():
@@ -160,7 +194,7 @@ class DMS():
                     time.sleep(0.1)
                     g_tgz_file = os.listdir(temp_g_path)[0]
                     print("g_tgz_file:", g_tgz_file)
-                    job_operation.untgz(os.path.join(temp_g_path, os.listdir(temp_g_path)[0]), temp_g_path)
+                    CompressTool.untgz(os.path.join(temp_g_path, os.listdir(temp_g_path)[0]), temp_g_path)
                     if os.path.exists(os.path.join(temp_g_path, g_tgz_file)):
                         os.remove(os.path.join(temp_g_path, g_tgz_file))
 
