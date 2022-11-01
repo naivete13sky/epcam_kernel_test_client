@@ -110,9 +110,11 @@ def epcam():
     global driver
 
     if RunConfig.driver_type == "epcam":
-        # import epcam
-        # epcam.init()
-        # epcam_api.set_config_path(RunConfig.ep_cam_path)
+        from epcam_api import Configuration
+        Configuration.init(RunConfig.ep_cam_path)
+        Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
+        Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
+
         driver = None
 
     else:

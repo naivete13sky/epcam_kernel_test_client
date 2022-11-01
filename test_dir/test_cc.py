@@ -6,7 +6,7 @@ from config_g.g_cc_method import Asw
 from config import RunConfig
 from pathlib import Path
 
-from epcam_api import Configuration, Input, GUI
+from epcam_api import Input, GUI
 
 
 
@@ -20,9 +20,8 @@ def test_gerber_to_odb_ep_local_convert_drill_none_2_4(job_id,prepare_test_job_c
     data["vs_time_g"] = vs_time_g#比对时间存入字典
     data["job_id"] = job_id
 
-    Configuration.init(r'C:\cc\ep_local\product\EP-CAM\version\20221031\EP-CAM_beta_2.29.055_s19_jiami\Release')
-    Input.open_job("test1", r"C:\job\test\odb")
-    GUI.show_layer("test1", "orig", "top")
+    Input.open_job("eni40021", r"C:\job\test\odb")
+    GUI.show_layer("eni40021", "orig", "top")
 
     assert 1 == 1
 
