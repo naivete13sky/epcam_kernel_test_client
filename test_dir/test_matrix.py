@@ -10,6 +10,10 @@ from epcam_api import Input, GUI
 from epcam_api.Action import Information
 from epcam_api.Edition import Matrix
 
+
+from config_ep.epcam import epcam
+
+
 class TestMatrixLayerCopy:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Matrix'))
     def test_matrix_layer_copy_one_layer(self,job_id,prepare_test_job_clean_g):
@@ -46,8 +50,12 @@ class TestMatrixLayerCopy:
         all_layers_list_post = Information.get_layers(job)
         print('all_layers_list_post:', all_layers_list_post)
 
-
-        #需要保存料号的功能，目前没有
+        #比图前需要保存料号
+        data = {
+            'func': 'JOB_SAVE',
+            'paras': [{'job': job}]
+        }
+        epcam.process(json.dumps(data))
 
         Print.print_with_delimiter('比图操作--开始')
         job_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format(
