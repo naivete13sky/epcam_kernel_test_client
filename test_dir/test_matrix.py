@@ -7,6 +7,8 @@ from config import RunConfig
 from pathlib import Path
 
 from epcam_api import Input, GUI
+from epcam_api.Action import Information
+from epcam_api.Edition import Matrix
 
 class TestMatrixLayerCopy:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Input'))
@@ -19,16 +21,22 @@ class TestMatrixLayerCopy:
         data["vs_time_g"] = vs_time_g#比对时间存入字典
         data["job_id"] = job_id
 
+        job = 'eni40021'
+        job_parent_path = r'C:\job\test\odb'
 
-        Input.open_job("eni40021", r"C:\job\test\odb")
-        # GUI.show_layer("eni40021", "orig", "top")
-        from epcam_api.Edition import Matrix
-        result = Matrix.copy_layer('eni40021', 'adb.art')
-        print(result)
+        Input.open_job(job, job_parent_path)
         # GUI.show_layer("eni40021", "orig", "top")
 
+        all_layers_list_pre = Information.get_layers(job)
+        print('all_layers_list_pre:',all_layers_list_pre)
 
+        result_matrix_copy_layer = Matrix.copy_layer(job, all_layers_list_pre[0])
+        print('result_matrix_copy_layer:',result_matrix_copy_layer)
 
-        assert 1 == 1
+        all_layers_list_post = Information.get_layers(job)
+        print('all_layers_list_post:', all_layers_list_post)
 
+        Print.print_with_delimiter('开始断言')
+        assert all_layers_list_pre[0] + '+1' == all_layers_list_post[-1]
+        Print.print_with_delimiter('完成断言')
 
