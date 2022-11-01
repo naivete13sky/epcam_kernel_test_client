@@ -212,9 +212,16 @@ class DMS():
 
 class Print():
     @staticmethod
-    def print_with_delimiter(text, sign='*', numbers=198):
+    def print_with_delimiter1(text, sign='*', numbers=198):
         pass
         print(str(sign) * int((numbers - len(text.encode('utf-8'))) / 2), text, str(sign) * int((numbers - len(text.encode('utf-8'))) / 2))
+
+    @staticmethod
+    def print_with_delimiter(text,sign='*',numbers=200):
+        pass
+        print(text.center( int(numbers) - len(text), '*'))
+
+
 
 
 def get_data(file_path):
@@ -253,8 +260,6 @@ def else1():
 
 if __name__ == "__main__":
     print("我是main()")
-    job_id = 2182
-    layer_drill = DMS().get_job_layer_drill_from_dms_db_pandas_one_job(job_id)
-    print('*' * 50, '\n', "layer_drill:", layer_drill)
-    print([each.lower() for each in DMS().get_job_layer_drill_from_dms_db_pandas_one_job(job_id)['layer'] ])
+    Print.print_with_delimiter("你好啊！")
+    Print.print_with_delimiter("abc！")
 
