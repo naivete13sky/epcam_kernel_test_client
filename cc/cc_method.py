@@ -214,7 +214,7 @@ class Print():
     @staticmethod
     def print_with_delimiter(text, sign='*', numbers=198):
         pass
-        print(str(sign) * int((numbers - len(text)) / 2), text, str(sign) * int((numbers - len(text)) / 2))
+        print(str(sign) * int((numbers - len(text.encode('utf-8'))) / 2), text, str(sign) * int((numbers - len(text.encode('utf-8'))) / 2))
 
 
 def get_data(file_path):
