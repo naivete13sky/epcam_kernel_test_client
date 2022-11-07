@@ -16,15 +16,11 @@ sys.path.insert(0, os.path.join(base_path,r'config_ep/epcam'))
 
 import tarfile as tf
 
-
-
-
 class GetTestData():
     pass
     def get_job_id(self,fun):
         pd_1=pd.read_excel(io=os.path.join(os.path.abspath('.'),r"config.xlsx"), sheet_name="test_data")
         return [ each2 for each1 in pd_1[(pd_1["测试功能"]==fun) & (pd_1["是否执行"] == 1)][['测试料号']].values.tolist() for each2 in each1]
-
 
 class CompressTool():
     @staticmethod
@@ -55,9 +51,7 @@ class CompressTool():
         # os.system('pause')
         return
 
-
 class DMS():
-    pass
 
     # 下载文件
     def file_downloand(self,need_file_path, save_path):  #######文件下载
