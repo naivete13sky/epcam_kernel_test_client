@@ -36,33 +36,9 @@ class MyInput(object):
         Job.create_job(job)
         Matrix.create_step(job, 'orig')
         result_file_identify = Input.file_identify(r"C:\Users\cheng.chen\Desktop\760\LAYER2.art")
-        print(result_file_identify)
-        print('分割线'.center(190, '-'))
-
-        param = {'Coordinates': result_file_identify['parameters']['Coordinates'],
-                'Decimal_numbers': result_file_identify['parameters']['Decimal_numbers'],
-                'Number_format_decimal': result_file_identify['parameters']['Number_format_decimal'],
-                'Number_format_integer': result_file_identify['parameters']['Number_format_integer'],
-                'data_type': result_file_identify['parameters']['data_type'],
-                'file_size': result_file_identify['parameters']['file_size'],
-                'format': result_file_identify['parameters']['format'],
-                'max_numbers': result_file_identify['parameters']['max_numbers'],
-                'min_numbers': result_file_identify['parameters']['min_numbers'],
-                'offset_numbers': result_file_identify['parameters']['offset_numbers'],
-                'separator_char': result_file_identify['parameters']['separator_char'],
-                'text_line_width': result_file_identify['parameters']['text_line_width'],
-                'tool_units': result_file_identify['parameters']['tool_units'],
-                'units': result_file_identify['parameters']['units'],
-                'zeroes_omitted':result_file_identify['parameters']['zeroes_omitted']
-                }
-
-        print(param)
-
-        r = Input.file_translate(path = r"C:\Users\cheng.chen\Desktop\760\LAYER2.art",
+        Input.file_translate(path = r"C:\Users\cheng.chen\Desktop\760\LAYER2.art",
                              job = job, step = 'orig', layer = 'layer',param = result_file_identify)
 
-        print(r)
-        print('分割线'.center(190, '-'))
 
         GUI.show_layer(job, "orig", "layer")
 
