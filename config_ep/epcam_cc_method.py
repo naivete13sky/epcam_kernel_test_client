@@ -21,20 +21,24 @@ def f1():
 class MyInput(object):
     def input_gerber_folder(self,folder_path,job,step,*,save_path=None):
         '''
-        命名关键字参数save_path，用来保存料号的路径
+        命名关键字参数save_path，用来保存料号的路径，未传此参数时，默认路径为r'C:\job\test\odb'。
         '''
-        #创建一个空料号
-        if not save_path:
-            save_path = r'C:\job\test\odb'
-        new_job_path = os.path.join(save_path, job)  # job若存在则删除
-        if os.path.exists(new_job_path):
-            shutil.rmtree(new_job_path)
+
+        #如果未指定保存路径
+        save_path = r'C:\job\test\odb' if not save_path else save_path
+
+        # job若存在则删除
+        shutil.rmtree(os.path.join(save_path, job)) if os.path.exists(os.path.join(save_path, job)) else True
+
+        # 创建一个空料号
         Job.create_job(job)
+
         #创建一个空step
         Matrix.create_step(job, step)
+
         #开始识别文件夹中各个文件的类型，此方只识别单层文件夹中的内容
         file_list = [x for x in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path,x))]
-        print('file_list:',file_list)
+
         for each_file in file_list:
             result_each_file_identify = Input.file_identify(os.path.join(folder_path,each_file))
             print(result_each_file_identify)
