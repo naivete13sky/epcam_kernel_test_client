@@ -21,20 +21,22 @@ def f1():
 
 class MyInput(object):
 
-    def __init__(self):
-        pass
+    def __init__(self,folder_path,job,step,*,save_path=None):
+        self.folder_path = folder_path
+        self.job = job
+        self.step = step
+        self.save_path = save_path
 
-
-
-    def fix_layer_name_same_to_g(self,folder_path):
+    def fix_layer_name_same_to_g(self):
         print('fix_layer_name_same_to_g'.center(190,'-'))
-
+        folder_path = self.folder_path
         # 开始识别文件夹中各个文件的类型，此方只识别单层文件夹中的内容
         file_list = [x for x in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, x))]
 
         unknown_index = 1
 
         for file in file_list:
+            # 把特殊字符替换成‘-’，比如空格、(、)等。
             os.rename(os.path.join(folder_path, file),os.path.join(folder_path, file.replace(' ', '-').replace('(', '-').replace(')', '-')))
             # 把含有中文字符名称的文件改名成unknown1\unknown2等
             if StringMehtod.is_chinese(file):
@@ -43,15 +45,16 @@ class MyInput(object):
                 # file = 'unknown' + str(unknown_index)
                 unknown_index = unknown_index + 1
 
-
-
-
-
-    def input_folder(self,folder_path,job,step,*,save_path=None):
+    def input_folder(self):
         '''
         函数：把指定路径下的所有Gerber274X或Excello2文件全部转换到指定名称的料号，并保存到指定路径。
         命名关键字参数save_path，用来保存料号的路径，未传此参数时，默认路径为r'C:\job\test\odb'。
         '''
+
+        folder_path = self.folder_path
+        job = self.job
+        step = self.step
+        save_path = self.save_path
 
         #如果未指定保存路径,默认路径为r'C:\job\test\odb'。
         save_path = r'C:\job\test\odb' if not save_path else save_path
@@ -97,7 +100,7 @@ if __name__ == "__main__":
     job = r'test'
     step = r'orig'
     save_path = r'C:\job\test\odb'
-    my_input = MyInput()
-    my_input.fix_layer_name_same_to_g(folder_path)
-    my_input.input_folder(folder_path, job, step)
+    my_input = MyInput(folder_path, job, step)
+    my_input.fix_layer_name_same_to_g()
+    my_input.input_folder()
 
