@@ -8,6 +8,7 @@ from epcam_api.Edition import Job,Matrix
 
 from config_ep.epcam import epcam
 
+from cc.cc_method import StringMehtod
 
 Configuration.init(RunConfig.ep_cam_path)
 Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
@@ -24,8 +25,27 @@ class MyInput(object):
         pass
 
 
-    def fix_layer_name_same_to_g(self):
-        pass
+
+    def fix_layer_name_same_to_g(self,folder_path):
+        print('fix_layer_name_same_to_g'.center(190,'-'))
+
+        # 开始识别文件夹中各个文件的类型，此方只识别单层文件夹中的内容
+        file_list = [x for x in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, x))]
+
+        unknown_index = 1
+
+        for file in file_list:
+            os.rename(os.path.join(folder_path, file),os.path.join(folder_path, file.replace(' ', '-').replace('(', '-').replace(')', '-')))
+            # 把含有中文字符名称的文件改名成unknown1\unknown2等
+            if StringMehtod.is_chinese(file):
+                suffix_of_file = os.path.splitext(file)[1]
+                os.rename(os.path.join(folder_path,file), os.path.join(folder_path,'unknown' + str(unknown_index) + suffix_of_file))
+                # file = 'unknown' + str(unknown_index)
+                unknown_index = unknown_index + 1
+
+
+
+
 
     def input_folder(self,folder_path,job,step,*,save_path=None):
         '''
@@ -77,6 +97,7 @@ if __name__ == "__main__":
     job = r'test'
     step = r'orig'
     save_path = r'C:\job\test\odb'
-    cc = MyInput()
-    cc.input_folder(folder_path, job, step)
+    my_input = MyInput()
+    my_input.fix_layer_name_same_to_g(folder_path)
+    my_input.input_folder(folder_path, job, step)
 
