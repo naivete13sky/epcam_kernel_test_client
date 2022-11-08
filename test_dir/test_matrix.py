@@ -14,7 +14,7 @@ from epcam_api.Edition import Matrix
 from config_ep.epcam import epcam
 
 
-class cTestMatrixLayerCopy:
+class aTestMatrixLayerCopy:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Matrix'))
     def test_matrix_layer_copy_one_layer(self,job_id,prepare_test_job_clean_g):
         Print.print_with_delimiter("G软件VS开始啦！")
