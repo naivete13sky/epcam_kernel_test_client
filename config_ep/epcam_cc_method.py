@@ -83,17 +83,6 @@ class MyInput(object):
 
 
 
-class MyJob(object):
-    def my_save_job_odb(self,job):
-        # 比图前需要保存料号
-        data = {
-            'func': 'JOB_SAVE',
-            'paras': [{'job': job}]
-        }
-        epcam.process(json.dumps(data))
-
-
-
 
 if __name__ == "__main__":
     folder_path = r"C:\Users\cheng.chen\Desktop\760"
