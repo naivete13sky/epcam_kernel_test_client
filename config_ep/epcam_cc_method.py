@@ -3,7 +3,7 @@ import os
 import shutil
 
 from config import RunConfig
-from epcam_api import Configuration, Input, GUI
+from epcam_api import Configuration, Input, GUI,BASE
 from epcam_api.Edition import Job,Matrix
 
 from config_ep.epcam import epcam
@@ -36,9 +36,11 @@ class MyInput(object):
         Job.create_job(job)
         Matrix.create_step(job, 'orig')
         result_file_identify = Input.file_identify(r"C:\Users\cheng.chen\Desktop\760\LAYER2.art")
+        # print(result_file_identify)
         Input.file_translate(path = r"C:\Users\cheng.chen\Desktop\760\LAYER2.art",
                              job = job, step = 'orig', layer = 'layer',param = result_file_identify)
 
+        BASE.save_job_as(job,r'C:\job\test\odb')
 
         GUI.show_layer(job, "orig", "layer")
 
@@ -54,6 +56,9 @@ class MyJob(object):
             'paras': [{'job': job}]
         }
         epcam.process(json.dumps(data))
+
+
+
 
 if __name__ == "__main__":
     pass
