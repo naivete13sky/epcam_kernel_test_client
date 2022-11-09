@@ -2,7 +2,7 @@ import os, time,json,shutil,sys
 from cc import cc_method
 from cc.cc_method import GetTestData,DMS,Print,getFlist
 import pytest
-from config_g.g_cc_method import Asw
+from config_g.g_cc_method import G
 from config import RunConfig
 from pathlib import Path
 

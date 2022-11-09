@@ -55,6 +55,15 @@ class RunConfig:
     # 浏览器驱动（不需要修改）
     driver = None
 
+    # epcam驱动（不需要修改）
+    driver_epcam = None
+
+    # g驱动类型
+    driver_type_g = "g"
+
+    # g驱动（不需要修改）
+    driver_g = None
+
     # 报告路径（不需要修改）
     NEW_REPORT = None
 

@@ -5,7 +5,7 @@ from cc.cc_method import Print,DMS
 
 LAYER_COMPARE_JSON = 'layer_compare.json'
 
-class Asw():
+class G():
     def __init__(self,gateway_path):
         self.gateway_path=gateway_path
         command = '{} 1'.format(self.gateway_path)
@@ -1000,10 +1000,10 @@ def getFlist(path):
 
 if __name__ == '__main__':
     from config import RunConfig
-    asw = Asw(RunConfig.gateway_path)
+    g = G(RunConfig.gateway_path)
 
     #删除所有料号
-    # asw.clean_g_all_pre_get_job_list(r'//vmware-host/Shared Folders/share/job_list.txt')
-    # asw.clean_g_all_do_clean(r'C:\cc\share\job_list.txt')
-    asw.import_odb_folder(r'Z:/share/temp_502_1666269720/g/500a001w1-r.g')
-    # asw.import_odb_folder(r'')
+    # g.clean_g_all_pre_get_job_list(r'//vmware-host/Shared Folders/share/job_list.txt')
+    # g.clean_g_all_do_clean(r'C:\cc\share\job_list.txt')
+    g.import_odb_folder(r'Z:/share/temp_502_1666269720/g/500a001w1-r.g')
+    # g.import_odb_folder(r'')

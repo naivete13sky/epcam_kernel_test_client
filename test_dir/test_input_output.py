@@ -2,7 +2,7 @@ import os, time,json,shutil,sys
 from cc import cc_method
 from cc.cc_method import GetTestData,DMS,Print,getFlist
 import pytest
-from config_g.g_cc_method import Asw
+from config_g.g_cc_method import G
 from config import RunConfig
 from pathlib import Path
 
@@ -21,7 +21,8 @@ class TestInputOutputGerber274X:
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
 
         Print.print_with_delimiter("G软件VS开始啦！")
-        asw = Asw(RunConfig.gateway_path)#拿到G软件
+        # g = G(RunConfig.gateway_path)#拿到G软件
+        g = RunConfig.driver_g#拿到G软件
 
         data = {}#存放当前测试料号的每一层的比对结果。
         g_vs_total_result_flag = True  # True表示最新一次G比对通过
@@ -78,10 +79,10 @@ class TestInputOutputGerber274X:
         print("tol:", tol)
         map_layer_res = 200
         # 导入要比图的资料
-        asw.import_odb_folder(job_g_remote_path)
-        asw.import_odb_folder(job_ep_remote_path)
+        g.import_odb_folder(job_g_remote_path)
+        g.import_odb_folder(job_ep_remote_path)
         # G打开要比图的2个料号
-        asw.layer_compare_g_open_2_job(job1=job_g, step='orig', job2=job_ep)
+        g.layer_compare_g_open_2_job(job1=job_g, step='orig', job2=job_ep)
         g_compare_result_folder = 'g_compare_result'
         temp_g_compare_result_path = os.path.join(temp_path, g_compare_result_folder)
         if not os.path.exists(temp_g_compare_result_path):
@@ -94,7 +95,7 @@ class TestInputOutputGerber274X:
         for layer in all_layers_list_job_g:
             if layer in all_layers_list_job_ep:
                 map_layer = layer + '-com'
-                result = asw.layer_compare_one_layer(job1=job_g, step1='orig', layer1=layer, job2=job_ep,
+                result = g.layer_compare_one_layer(job1=job_g, step1='orig', layer1=layer, job2=job_ep,
                                                      step2='orig', layer2=layer, layer2_ext='_copy', tol=tol,
                                                      map_layer=map_layer, map_layer_res=map_layer_res,
                                                      result_path_remote=temp_path_remote_g_compare_result,
@@ -105,9 +106,9 @@ class TestInputOutputGerber274X:
                     g_vs_total_result_flag = False
             else:
                 print("悦谱转图中没有此层")
-        asw.save_job(job_g)
-        asw.save_job(job_ep)
-        asw.layer_compare_close_job(job1=job_g, job2=job_ep)
+        g.save_job(job_g)
+        g.save_job(job_ep)
+        g.layer_compare_close_job(job1=job_g, job2=job_ep)
 
 
         # 开始查看比对结果

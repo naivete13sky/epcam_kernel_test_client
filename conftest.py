@@ -7,7 +7,7 @@ from os.path import dirname, abspath
 # import epcam_api
 # base_path = dirname(dirname(abspath(__file__)))
 # sys.path.insert(0, base_path)
-from config_g.g_cc_method import Asw
+from config_g.g_cc_method import G
 
 
 
@@ -107,7 +107,7 @@ def epcam():
     全局定义epcam驱动
     :return:
     """
-    global driver
+    global driver_epcam
 
     if RunConfig.driver_type == "epcam":
         from epcam_api import Configuration
@@ -115,23 +115,42 @@ def epcam():
         Configuration.set_sys_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\sysattr'))
         Configuration.set_user_attr_path(os.path.join(RunConfig.ep_cam_path,r'config\attr_def\userattr'))
 
-        driver = None
+        driver_epcam = None
 
     else:
         raise NameError("driver驱动类型定义错误！")
 
-    RunConfig.driver = driver
+    RunConfig.driver_epcam = driver_epcam
 
-    return driver
+    return driver_epcam
+
+# 加载g
+@pytest.fixture(scope='session', autouse=True)
+def g():
+    """
+    全局定义epcam驱动
+    :return:
+    """
+    global driver_g
+
+    if RunConfig.driver_type_g == "g":
+        driver_g = G(RunConfig.gateway_path)  # 拿到G软件
+
+    else:
+        raise NameError("driver_g驱动类型定义错误！")
+
+    RunConfig.driver_g = driver_g
+
+    return driver_g
+
 
 @pytest.fixture(scope='function', autouse=False)
 def prepare_test_job_clean_g():
-    pass
     # 删除所有料号
-    # asw = Asw(r"C:\EPSemicon\cc\gateway.exe")
-    asw = Asw(RunConfig.gateway_path)
-    asw.clean_g_all_pre_get_job_list(r'//vmware-host/Shared Folders/share/job_list.txt')
-    asw.clean_g_all_do_clean(r'C:\cc\share\job_list.txt')
+    # g = G(RunConfig.gateway_path)
+    g = RunConfig.driver_g
+    g.clean_g_all_pre_get_job_list(r'//vmware-host/Shared Folders/share/job_list.txt')
+    g.clean_g_all_do_clean(r'C:\cc\share\job_list.txt')
 
     #yield前是前置操作
     yield
