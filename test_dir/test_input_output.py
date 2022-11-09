@@ -16,12 +16,13 @@ from config_ep.epcam import epcam
 from config_ep.epcam_cc_method import MyInput
 
 class TestInputOutputGerber274X:
-    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Input'))
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Input_Output'))
     def test_input_output_gerber274x(self,job_id,prepare_test_job_clean_g):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
 
         Print.print_with_delimiter("G软件VS开始啦！")
         asw = Asw(RunConfig.gateway_path)#拿到G软件
+
         data = {}#存放当前测试料号的每一层的比对结果。
         g_vs_total_result_flag = True  # True表示最新一次G比对通过
         vs_time_g = str(int(time.time()))#比对时间
@@ -34,14 +35,13 @@ class TestInputOutputGerber274X:
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
 
-        # 下载并解压原始gerber文件
+        # 悦谱转图。先下载并解压原始gerber文件。然后转图。
         DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
-        # 悦谱转图
         folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower())
         job_ep = os.listdir(temp_gerber_path)[0].lower()  + '_ep'
         step = r'orig'
         save_path = temp_ep_path
-        my_input = MyInput(folder_path, job_ep, step,job_id,save_path=save_path)
+        MyInput(folder_path, job_ep, step,job_id,save_path=save_path)
 
         # 获取 job_ep 的层别信息
         print("job_ep:", job_ep)
