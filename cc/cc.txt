@@ -18,3 +18,8 @@ param = {'Coordinates': result_file_identify['parameters']['Coordinates'],
                 'units': result_file_identify['parameters']['units'],
                 'zeroes_omitted':result_file_identify['parameters']['zeroes_omitted']
                 }
+
+
+{'format': 'Gerber274x', 'name': 'Znn-2786693_st.gbr', 'parameters': {'Coordinates': 'Incremental', 'Decimal_numbers': True, 'Number_format_decimal': 3, 'Number_format_integer': 3, 'data_type': 'Ascii', 'fi
+le_size': 60795.0, 'format': 'Gerber274x', 'max_numbers': {'first': 348000016.5291131, 'second': 331328015.7372355}, 'min_numbers': {'first': 0.0, 'second': 0.0}, 'offset_numbers': {'first': 0.0, 'second':
+0.0}, 'separator_char': '*', 'text_line_width': 0.0, 'tool_units': ' ', 'units': 'MM', 'zeroes_omitted': 'Leading'}}

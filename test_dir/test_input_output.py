@@ -15,9 +15,11 @@ from config_ep.epcam import epcam
 
 from config_ep.epcam_cc_method import MyInput
 
-class TestInputGerber274X:
+class TestInputOutputGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Input'))
-    def test_matrix_layer_copy_one_layer(self,job_id,prepare_test_job_clean_g):
+    def test_input_output_gerber274x(self,job_id,prepare_test_job_clean_g):
+        '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
+
         Print.print_with_delimiter("G软件VS开始啦！")
         asw = Asw(RunConfig.gateway_path)#拿到G软件
         data = {}#存放当前测试料号的每一层的比对结果。
@@ -39,16 +41,15 @@ class TestInputGerber274X:
         job_ep = os.listdir(temp_gerber_path)[0].lower()  + '_ep'
         step = r'orig'
         save_path = temp_ep_path
-        my_input = MyInput(folder_path, job_ep, step,save_path=save_path)
-        my_input.fix_layer_name_same_to_g()
-        my_input.input_folder()
+        my_input = MyInput(folder_path, job_ep, step,job_id,save_path=save_path)
+
 
 
         # 下载G转图tgz，并解压好
         DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
         job = os.listdir(temp_g_path)[0]
 
-        # 打开job_ep
+        # 获取 job_ep 的层别信息
         print("job_ep:", job_ep)
         all_layers_list_job_ep = Information.get_layers(job_ep)
         if len(all_layers_list_job_ep) == 0:
@@ -68,7 +69,7 @@ class TestInputGerber274X:
             print('G软件tgz中的层信息：', all_layers_list_job_g)
 
 
-        assert job_id == 511
+
 
 
 
