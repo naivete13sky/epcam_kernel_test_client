@@ -436,6 +436,9 @@ class G():
 
     def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,all_layers_list_job1,job2,all_layers_list_job2,adjust_position=False,**kwargs):
         global g_vs_total_result_flag
+        adjust_position = adjust_position
+
+
         data_g = {}
         g_vs_total_result_flag = True  # True表示最新一次G比对通过
         # 读取配置文件
@@ -472,7 +475,7 @@ class G():
                                                    map_layer=map_layer, map_layer_res=map_layer_res,
                                                    result_path_remote=temp_path_remote_g_compare_result,
                                                    result_path_local=temp_path_local_g_compare_result,
-                                                   layer_type=layer_type,adjust_position=True,
+                                                   layer_type=layer_type,adjust_position=adjust_position,
                                                       temp_path=temp_path)
                 all_result_g[layer] = result
                 if result != "正常":
