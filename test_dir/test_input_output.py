@@ -229,7 +229,7 @@ class TestInputOutputGerber274X:
                     # drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
                     drill_info = BASE.drill2file(job_ep, step, drill_layer,drill_out_path,isMetric = False,number_format_l=2,number_format_r=4,
                     zeroes=2,unit=0,x_scale=1,y_scale=1,x_anchor=0,y_anchor=0, manufacator = '', tools_order = [])
-                    print("drill_info:",drill_info)
+                    # print("drill_info:",drill_info)
                 layer_etime = (int(time.time()))
                 layer_time = layer_etime - layer_stime
                 value[layer] = layer_time
@@ -259,7 +259,87 @@ class TestInputOutputGerber274X:
 
         Print.print_with_delimiter('输出gerber完成')
 
-        # ----------------------------------------开始测试输出gerber功能--------------------------------------------------------
+        # ----------------------------------------开始用G软件input--------------------------------------------------------
+        ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job_ep, r'orig')
+        job_g2 = os.listdir(temp_gerber_path)[0].lower() + '_g2'  # epcam输出gerber，再用g软件input。
+        step = 'orig'
+        file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
+        gerberList = cc_method.getFlist(file_path)
+        print(gerberList)
+        g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
+        gerberList_path = []
+        for each in gerberList:
+            gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job_ep, r'orig', each))
+        print(gerberList_path)
+
+        temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
+        if os.path.exists(temp_out_put_gerber_g_input_path):
+            shutil.rmtree(temp_out_put_gerber_g_input_path)
+        os.mkdir(temp_out_put_gerber_g_input_path)
+        out_path = temp_out_put_gerber_g_input_path
+
+        g.g_Gerber2Odb2_no_django(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
+        # 输出tgz到指定目录
+        g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
+
+        # ----------------------------------------开始用G软件比图，g1和g2--------------------------------------------------------
+        # 再导入一个标准G转图，加个后缀1。
+        job_g1 = job_g + "1"
+        Print.print_with_delimiter("job_g1")
+        print(job_g1)
+        g.import_odb_folder(job_g_remote_path, job_name=job_g1)
+        Print.print_with_delimiter("job_g1")
+
+        g1_compare_result_folder = 'g1_compare_result'
+        temp_g1_compare_result_path = os.path.join(temp_path, g1_compare_result_folder)
+        if not os.path.exists(temp_g1_compare_result_path):
+            os.mkdir(temp_g1_compare_result_path)
+        temp_path_remote_g1_compare_result = r'//vmware-host/Shared Folders/share/{}/{}'.format(
+            'temp' + "_" + str(job_id) + "_" + vs_time_g, g1_compare_result_folder)
+        temp_path_local_g1_compare_result = os.path.join(temp_path, g1_compare_result_folder)
+
+        temp_path_local_info1 = os.path.join(temp_path, 'info1')
+        if not os.path.exists(temp_path_local_info1):
+            os.mkdir(temp_path_local_info1)
+
+        temp_path_local_info2 = os.path.join(temp_path, 'info2')
+        if not os.path.exists(temp_path_local_info2):
+            os.mkdir(temp_path_local_info2)
+
+        # 以G1转图为主来比对
+        # G打开要比图的2个料号g1和g2。g1就是原始的G转图，g2是悦谱输出的gerber又input得到的
+        g.layer_compare_g_open_2_job(job1=job_g1, step='orig', job2=job_g2)
+        all_result_g1 = {}
+        for layer in all_layers_list_job_g:
+            if layer in layers:
+                map_layer = layer + '-com'
+                layer_type = ""
+                if layer in drill_layers:
+                    print("我是孔层哈！")
+                    layer_type = 'drill'
+
+                # 准备改一下下面这行的参数，换成job名称，不要jobpath。另外job1是已经打开了的，不需要传参数了。
+                result = g.layer_compare_one_layer(job1=job_g1, step1='orig', layer1=layer, job2=job_g2,
+                                                     step2='orig', layer2=layer, layer2_ext='_copy', tol=tol,
+                                                     map_layer=map_layer, map_layer_res=map_layer_res,
+                                                     result_path_remote=temp_path_remote_g1_compare_result,
+                                                     result_path_local=temp_path_local_g1_compare_result,
+                                                     layer_type=layer_type, temp_path=temp_path)
+                all_result_g1[layer] = result
+                if result != "正常":
+                    g1_vs_total_result_flag = False
+            else:
+                pass
+                print("悦谱转图中没有此层")
+
+        g.save_job(job_g1)
+        g.save_job(job_g2)
+        g.layer_compare_close_job(job1=job_g1, job2=job_g2)
+        data["all_result_g1"] = all_result_g1
+
+        Print.print_with_delimiter("断言--看一下G1转图中的层是不是都有比对结果")
+        assert len(all_layers_list_job_g) == len(all_result_g1)
+
 
 
 
@@ -275,7 +355,7 @@ class TestInputOutputGerber274X:
         Print.print_with_delimiter('分割线', sign='-')
         print('所有层：', all_result)
         Print.print_with_delimiter('分割线', sign='-')
-        # print('G1转图的层：', all_result_g1)
+        print('G1转图的层：', all_result_g1)
         Print.print_with_delimiter('比对结果信息展示--结束')
 
         Print.print_with_delimiter("断言--开始")
@@ -283,9 +363,9 @@ class TestInputOutputGerber274X:
         for key in all_result_g:
             assert all_result_g[key] == "正常"
 
-        # assert g1_vs_total_result_flag == True
-        # for key in all_result_g1:
-        #     assert all_result_g1[key] == "正常"
+        assert g1_vs_total_result_flag == True
+        for key in all_result_g1:
+            assert all_result_g1[key] == "正常"
         Print.print_with_delimiter("断言--结束")
 
 
