@@ -100,7 +100,7 @@ class G():
         elif comp_result_text == 'yes':
             result = '错误'
             Print.print_with_delimiter("第一次比图未通过")
-            if layer_type == 'drill':
+            if layer_type == 'drill' and kwargs['adjust_position']:
                 Print.print_with_delimiter("再给一次较正孔位置的机会！")
                 #先获取坐标，算出偏移量，然后用G移。
                 temp_path_local_g_info1_folder = r'{}\info1'.format(temp_path)
@@ -434,7 +434,7 @@ class G():
                 return results
         time.sleep(1)
 
-    def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,all_layers_list_job1,job2,all_layers_list_job2,**kwargs):
+    def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,all_layers_list_job1,job2,all_layers_list_job2,adjust_position=False,**kwargs):
         global g_vs_total_result_flag
         data_g = {}
         g_vs_total_result_flag = True  # True表示最新一次G比对通过
@@ -447,7 +447,7 @@ class G():
 
         # G打开要比图的2个料号
         self.layer_compare_g_open_2_job(job1=job1, step='orig', job2=job2)
-        g_compare_result_folder = 'g_compare_result'
+        g_compare_result_folder = job1 + '_compare_result'
         temp_g_compare_result_path = os.path.join(temp_path, g_compare_result_folder)
         if not os.path.exists(temp_g_compare_result_path):
             os.mkdir(temp_g_compare_result_path)
@@ -455,16 +455,25 @@ class G():
             'temp' + "_" + str(job_id) + "_" + vs_time_g, g_compare_result_folder)
         temp_path_local_g_compare_result = os.path.join(temp_path, g_compare_result_folder)
 
+        drill_layers = [each.lower() for each in DMS().get_job_layer_drill_from_dms_db_pandas_one_job(job_id)['layer']]
+
         all_result_g = {}
         for layer in all_layers_list_job1:
             if layer in all_layers_list_job2:
+                layer_type = ""
+                if layer in drill_layers:
+                    print("我是孔层哈！")
+                    layer_type = 'drill'
+
+
                 map_layer = layer + '-com'
                 result = self.layer_compare_one_layer(job1=job1, step1='orig', layer1=layer, job2=job2,
                                                    step2='orig', layer2=layer, layer2_ext='_copy', tol=tol,
                                                    map_layer=map_layer, map_layer_res=map_layer_res,
                                                    result_path_remote=temp_path_remote_g_compare_result,
                                                    result_path_local=temp_path_local_g_compare_result,
-                                                   temp_path=temp_path)
+                                                   layer_type=layer_type,adjust_position=True,
+                                                      temp_path=temp_path)
                 all_result_g[layer] = result
                 if result != "正常":
                     g_vs_total_result_flag = False

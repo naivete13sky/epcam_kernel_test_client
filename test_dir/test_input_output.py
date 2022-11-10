@@ -215,23 +215,16 @@ class TestInputOutputGerber274X:
         # ----------------------------------------开始用G软件比图，g1和g2--------------------------------------------------------
         # 再导入一个标准G转图，加个后缀1。
         job_g1 = job_g + "1"
-        Print.print_with_delimiter("job_g1")
-        print(job_g1)
-
         g.import_odb_folder(job_g_remote_path, job_name=job_g1)
-        Print.print_with_delimiter("job_g1")
         g1_compare_result_folder = 'g1_compare_result'
         temp_g1_compare_result_path = os.path.join(temp_path, g1_compare_result_folder)
         if not os.path.exists(temp_g1_compare_result_path):
             os.mkdir(temp_g1_compare_result_path)
-        temp_path_remote_g1_compare_result = r'//vmware-host/Shared Folders/share/{}/{}'.format(
-            'temp' + "_" + str(job_id) + "_" + vs_time_g, g1_compare_result_folder)
-        temp_path_local_g1_compare_result = os.path.join(temp_path, g1_compare_result_folder)
 
+        #校正孔用
         temp_path_local_info1 = os.path.join(temp_path, 'info1')
         if not os.path.exists(temp_path_local_info1):
             os.mkdir(temp_path_local_info1)
-
         temp_path_local_info2 = os.path.join(temp_path, 'info2')
         if not os.path.exists(temp_path_local_info2):
             os.mkdir(temp_path_local_info2)
@@ -240,7 +233,7 @@ class TestInputOutputGerber274X:
         # G打开要比图的2个料号g1和g2。g1就是原始的G转图，g2是悦谱输出的gerber又input得到的
         r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
                                 job1=job_g1, all_layers_list_job1=all_layers_list_job_g, job2=job_g2,
-                                all_layers_list_job2=all_layers_list_job_ep)
+                                all_layers_list_job2=all_layers_list_job_ep,adjust_position=True)
         data["all_result_g1"] = r['all_result_g']
         data["all_result"] = r['all_result']
         data['g1_vs_total_result_flag'] = r['g_vs_total_result_flag']
