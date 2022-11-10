@@ -6,7 +6,7 @@ from config_g.g_cc_method import G
 from config import RunConfig
 from pathlib import Path
 
-from epcam_api import Input, GUI,Output
+from epcam_api import Input, GUI,Output,BASE
 from epcam_api.Action import Information
 from epcam_api.Edition import Matrix,Job
 
@@ -226,7 +226,9 @@ class TestInputOutputGerber274X:
                 else:
                     Print.print_with_delimiter("我是drill啊")
                     Matrix.change_matrix_row(job_ep, drill_layer, 'board', 'drill', drill_layer)
-                    drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
+                    # drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
+                    drill_info = BASE.drill2file(job_ep, step, drill_layer,drill_out_path,isMetric = False,number_format_l=2,number_format_r=4,
+                    zeroes=2,unit=0,x_scale=1,y_scale=1,x_anchor=0,y_anchor=0, manufacator = '', tools_order = [])
                     print("drill_info:",drill_info)
                 layer_etime = (int(time.time()))
                 layer_time = layer_etime - layer_stime
@@ -252,7 +254,7 @@ class TestInputOutputGerber274X:
                 with open(out_json, 'w+') as hh:
                     hh.write(json.dumps(ret_json, sort_keys=True, indent=4, separators=(',', ': ')))
 
-        GUI.show_layer(job_ep, "orig", "layer")
+        # GUI.show_layer(job_ep, "orig", "layer")
         Job.close_job(job_ep)
 
         Print.print_with_delimiter('输出gerber完成')
