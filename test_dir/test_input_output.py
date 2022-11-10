@@ -8,7 +8,7 @@ from pathlib import Path
 
 from epcam_api import Input, GUI,Output
 from epcam_api.Action import Information
-from epcam_api.Edition import Matrix
+from epcam_api.Edition import Matrix,Job
 
 
 from config_ep.epcam import epcam
@@ -165,12 +165,12 @@ class TestInputOutputGerber274X:
             scalepointY = infos_['scalepointY']
             mirrordirection = infos_['mirrordirection']
             cut_polygon = infos_['cut_polygon']
-            mirrorX = infos_['cut_polygon']
-            mirrorY = infos_['cut_polygon']
+            mirrorX = infos_['mirrorX']
+            mirrorY = infos_['mirrorY']
 
 
-        layers = Information().get_layers(job_ep)
-        steps = Information().get_steps(job_ep)
+        layers = Information.get_layers(job_ep)
+        steps = Information.get_steps(job_ep)
         file_path = os.path.join(temp_out_put_gerber_path,job_ep)
         file_path_file = Path(file_path)
         if file_path_file.exists():
@@ -206,9 +206,6 @@ class TestInputOutputGerber274X:
                 filename = os.path.join(step_path,layer)# 当前step下的每个层的gerber文件路径
                 ret = Output.save_gerber(job_ep, step, layer, filename, resize, angle, scalingX,scalingY,mirror, rotate, scale,cw,
                                          mirrorpointX,mirrorpointY,rotatepointX,rotatepointY, scalepointX, scalepointY, mirrorX, mirrorY)
-
-
-
                 layer_etime = (int(time.time()))
                 layer_time = layer_etime - layer_stime
                 value[layer] = layer_time
@@ -216,13 +213,16 @@ class TestInputOutputGerber274X:
             # 输出excellon2
             for drill_layer in drill_layers:
                 layer_stime = (int(time.time()))
-                drillname = step_path + '\\' + drill_layer
+                drill_out_path = os.path.join(step_path,drill_layer)
 
                 if drill_layer in rout_layers:
                     Print.print_with_delimiter("我是rout")
-                    drill_info = epcam_api.rout2file(job_ep_name, step, drill_layer, drillname)
+                    drill_info = Output.save_rout(job_ep, step, drill_layer, drill_out_path, number_format_l=2, number_format_r=4, zeroes=2, unit=0,
+                                                  tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0, break_arcs = False)
                 else:
-                    drill_info = epcam_api.drill2file(job_ep_name, step, drill_layer, drillname, False)
+                    Print.print_with_delimiter("我是drill啊")
+                    drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
+                    print("drill_info:",drill_info)
                 layer_etime = (int(time.time()))
                 layer_time = layer_etime - layer_stime
                 value[layer] = layer_time
@@ -245,7 +245,7 @@ class TestInputOutputGerber274X:
                 ret_json.append(job_result)
                 with open(out_json, 'w+') as hh:
                     hh.write(json.dumps(ret_json, sort_keys=True, indent=4, separators=(',', ': ')))
-        epcam_api.close_job(job_ep_name)
+        Job.close_job(job_ep)
 
         Print.print_with_delimiter('输出gerber完成')
 

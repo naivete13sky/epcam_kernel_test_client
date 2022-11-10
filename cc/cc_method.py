@@ -206,12 +206,12 @@ class DMS():
 
 class Print():
     @staticmethod
-    def print_with_delimiter1(text, sign='*', numbers=198):
+    def print_with_delimiter(text, sign='*', numbers=198):
         pass
         print(str(sign) * int((numbers - len(text.encode('utf-8'))) / 2), text, str(sign) * int((numbers - len(text.encode('utf-8'))) / 2))
 
     @staticmethod
-    def print_with_delimiter(text,sign='*',numbers=200):
+    def print_with_delimiter1(text,sign='*',numbers=200):
         pass
         # print(text.center( int(numbers) - len(text.encode('utf-8')), '*'))
         print(text.center(int(numbers) - len(text), '*'))
