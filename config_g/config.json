@@ -2,7 +2,8 @@
     "job_manage": {
         "vs": {
             "vs_tol_ep": 0.9,
-            "vs_tol_g": 0.3
+            "vs_tol_g": 0.3,
+            "map_layer_res": 200
         },
         "port": 3306,
         "user": "root",

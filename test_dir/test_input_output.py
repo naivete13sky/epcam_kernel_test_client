@@ -37,10 +37,7 @@ class TestInputOutputGerber274X:
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
         MyInput(folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower()),
                 job = job_ep,step = r'orig',job_id = job_id,save_path = temp_ep_path)
-
-        # 获取 job_ep 的层别信息
         all_layers_list_job_ep = Information.get_layers(job_ep)
-        # GUI.show_layer(job, "orig", "layer")
 
         # 下载G转图tgz，并解压好，获取到文件夹名称，作为g料号名称
         job_g = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
@@ -53,13 +50,11 @@ class TestInputOutputGerber274X:
         job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format('temp' + "_" + str(job_id) + "_" + vs_time_g, job_g)
         job_ep_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format('temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
 
-
         # 读取配置文件
         with open(r'C:\cc\python\epwork\epcam_kernel_test_client\config_g\config.json', encoding='utf-8') as f:
             cfg = json.load(f)
         tol = cfg['job_manage']['vs']['vs_tol_g']
-        print("tol:", tol)
-        map_layer_res = 200
+        map_layer_res = cfg['job_manage']['vs']['map_layer_res']
         # 导入要比图的资料
         g.import_odb_folder(job_g_remote_path)
         g.import_odb_folder(job_ep_remote_path)
