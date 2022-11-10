@@ -51,6 +51,7 @@ class TestInputOutputGerber274X:
         else:
             print('悦谱软件tgz中的层信息：', all_layers_list_job_ep)
 
+
         # GUI.show_layer(job, "orig", "layer")
 
         # 下载G转图tgz，并解压好
@@ -212,20 +213,25 @@ class TestInputOutputGerber274X:
 
             # 输出excellon2
             for drill_layer in drill_layers:
+
                 layer_stime = (int(time.time()))
+
                 drill_out_path = os.path.join(step_path,drill_layer)
 
                 if drill_layer in rout_layers:
                     Print.print_with_delimiter("我是rout")
+                    Matrix.change_matrix_row(job_ep, drill_layer, 'board', 'rout', drill_layer)
                     drill_info = Output.save_rout(job_ep, step, drill_layer, drill_out_path, number_format_l=2, number_format_r=4, zeroes=2, unit=0,
                                                   tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0, break_arcs = False)
                 else:
                     Print.print_with_delimiter("我是drill啊")
+                    Matrix.change_matrix_row(job_ep, drill_layer, 'board', 'drill', drill_layer)
                     drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
                     print("drill_info:",drill_info)
                 layer_etime = (int(time.time()))
                 layer_time = layer_etime - layer_stime
                 value[layer] = layer_time
+
 
         # 记录下输出step的时间
         end_time = (int(time.time()))
@@ -245,6 +251,8 @@ class TestInputOutputGerber274X:
                 ret_json.append(job_result)
                 with open(out_json, 'w+') as hh:
                     hh.write(json.dumps(ret_json, sort_keys=True, indent=4, separators=(',', ': ')))
+
+        GUI.show_layer(job_ep, "orig", "layer")
         Job.close_job(job_ep)
 
         Print.print_with_delimiter('输出gerber完成')
