@@ -192,6 +192,7 @@ class DMS():
                     CompressTool.untgz(os.path.join(temp_g_path, os.listdir(temp_g_path)[0]), temp_g_path)
                     if os.path.exists(os.path.join(temp_g_path, g_tgz_file)):
                         os.remove(os.path.join(temp_g_path, g_tgz_file))
+                return os.listdir(temp_g_path)[0].lower()
 
     def get_job_layer_rout_from_dms_db_pandas_one_job(self, job_id,*args, **kwargs):
 

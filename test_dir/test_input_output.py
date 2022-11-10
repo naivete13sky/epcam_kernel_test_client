@@ -33,35 +33,19 @@ class TestInputOutputGerber274X:
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
 
-        # 悦谱转图。先下载并解压原始gerber文件。然后转图。
+        # 悦谱转图。先下载并解压原始gerber文件,拿到解压后的文件夹名称，此名称加上_ep就是我们要的名称。然后转图。
         job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
-
         MyInput(folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower()),
-                job = os.listdir(temp_gerber_path)[0].lower()  + '_ep',
-                step = r'orig',job_id = job_id,save_path = temp_ep_path)
+                job = job_ep,step = r'orig',job_id = job_id,save_path = temp_ep_path)
 
         # 获取 job_ep 的层别信息
-        print("job_ep:", job_ep)
         all_layers_list_job_ep = Information.get_layers(job_ep)
-        if len(all_layers_list_job_ep) == 0:
-            g_vs_total_result_flag = False
-            print("最新-EP-ODB++打开失败！！！！！")
-        else:
-            print('悦谱软件tgz中的层信息：', all_layers_list_job_ep)
-
-
         # GUI.show_layer(job, "orig", "layer")
 
-        # 下载G转图tgz，并解压好
-        DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
-        job_g = os.listdir(temp_g_path)[0].lower()
-        Input.open_job(job_g, temp_g_path)
+        # 下载G转图tgz，并解压好，获取到文件夹名称，作为g料号名称
+        job_g = DMS().get_file_from_dms_db(temp_path, job_id, field='file_odb_g', decompress='tgz')
+        Input.open_job(job_g, temp_g_path)#用悦谱CAM打开料号
         all_layers_list_job_g = Information.get_layers(job_g)
-        if len(all_layers_list_job_g) == 0:
-            g_vs_total_result_flag = False
-            print("G-ODB++打开失败！！！！！")
-        else:
-            print('G软件tgz中的层信息：', all_layers_list_job_g)
 
         # ----------------------------------------开始比图：G与EP--------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190,'-'))
