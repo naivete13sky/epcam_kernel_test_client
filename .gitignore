@@ -134,3 +134,4 @@ test_report/
 config.xlsx
 ~$config.xlsx
 my_config.json
+outcfg.json

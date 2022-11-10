@@ -6,7 +6,7 @@ from config_g.g_cc_method import G
 from config import RunConfig
 from pathlib import Path
 
-from epcam_api import Input, GUI
+from epcam_api import Input, GUI,Output
 from epcam_api.Action import Information
 from epcam_api.Edition import Matrix
 
@@ -20,8 +20,6 @@ class TestInputOutputGerber274X:
     def test_input_output_gerber274x(self,job_id,prepare_test_job_clean_g):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
 
-        Print.print_with_delimiter("G软件VS开始啦！")
-        # g = G(RunConfig.gateway_path)#拿到G软件
         g = RunConfig.driver_g#拿到G软件
 
         data = {}#存放当前测试料号的每一层的比对结果。
@@ -66,7 +64,7 @@ class TestInputOutputGerber274X:
         else:
             print('G软件tgz中的层信息：', all_layers_list_job_g)
 
-        #开始比图啦!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # ----------------------------------------开始比图：G与EP--------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190,'-'))
         job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format('temp' + "_" + str(job_id) + "_" + vs_time_g, job_g)
         job_ep_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format('temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
@@ -129,9 +127,133 @@ class TestInputOutputGerber274X:
 
         data["all_result_g"] = all_result_g
         data["all_result"] = all_result
-
-        Print.print_with_delimiter("断言--看一下G转图中的层是不是都有比对结果")
         assert len(all_layers_list_job_g) == len(all_result_g)
+
+        # ----------------------------------------开始测试输出gerber功能--------------------------------------------------------
+        g1_vs_total_result_flag = True
+        out_put = []
+        job_result = {}
+        out_json = ''
+
+        # 建立output_gerber文件夹，里面用来放epcam输出的gerber。
+        temp_out_put_gerber_path = os.path.join(temp_path, 'output_gerber')
+        if os.path.exists(temp_out_put_gerber_path):
+            shutil.rmtree(temp_out_put_gerber_path)
+        os.mkdir(temp_out_put_gerber_path)
+
+        # 设置导出参数
+        with open(RunConfig.config_ep_output, 'r') as cfg:
+            infos_ = json.load(cfg)['paras']  # (json格式数据)字符串 转化 为字典
+            _type = infos_['type']
+            resize = infos_['resize']
+            gdsdbu = infos_['gdsdbu']
+            angle = infos_['angle']
+            scalingX = infos_['scalingX']
+            scalingY = infos_['scalingY']
+            isReverse = infos_['isReverse']
+            mirror = infos_['mirror']
+            rotate = infos_['rotate']
+            scale = infos_['scale']
+            profiletop = infos_['profiletop']
+            cw = infos_['cw']
+            cutprofile = infos_['cutprofile']
+            mirrorpointX = infos_['mirrorpointX']
+            mirrorpointY = infos_['mirrorpointY']
+            rotatepointX = infos_['rotatepointX']
+            rotatepointY = infos_['rotatepointY']
+            scalepointX = infos_['scalepointX']
+            scalepointY = infos_['scalepointY']
+            mirrordirection = infos_['mirrordirection']
+            cut_polygon = infos_['cut_polygon']
+            mirrorX = infos_['cut_polygon']
+            mirrorY = infos_['cut_polygon']
+
+
+        layers = Information().get_layers(job_ep)
+        steps = Information().get_steps(job_ep)
+        file_path = os.path.join(temp_out_put_gerber_path,job_ep)
+        file_path_file = Path(file_path)
+        if file_path_file.exists():
+            shutil.rmtree(file_path_file)  # 已存在gerber文件夹删除掉，再新建
+        os.mkdir(file_path)
+
+
+        for step in steps:
+            value = {}
+            # 开始时间
+            start_time = (int(time.time()))
+            # 创建料的step文件夹
+            step_path = os.path.join(file_path, step)
+            os.mkdir(step_path)
+
+            drill_layers = [each.lower() for each in
+                            DMS().get_job_layer_drill_from_dms_db_pandas_one_job(job_id)['layer']]
+            rout_layers = [each.lower() for each in
+                           DMS().get_job_layer_rout_from_dms_db_pandas_one_job(job_id)['layer']]
+            print("drill_layers:", drill_layers)
+
+            #common_layers_list是非孔类型的文件
+            common_layers_list = []
+            layer_result = {}
+
+            for each_layer in layers:
+                if each_layer not in drill_layers:
+                    common_layers_list.append(each_layer)
+
+            # 输出gerber
+            for layer in common_layers_list:
+                layer_stime = (int(time.time()))
+                filename = os.path.join(step_path,layer)# 当前step下的每个层的gerber文件路径
+                ret = Output.save_gerber(job_ep, step, layer, filename, resize, angle, scalingX,scalingY,mirror, rotate, scale,cw,
+                                         mirrorpointX,mirrorpointY,rotatepointX,rotatepointY, scalepointX, scalepointY, mirrorX, mirrorY)
+
+
+
+                layer_etime = (int(time.time()))
+                layer_time = layer_etime - layer_stime
+                value[layer] = layer_time
+
+            # 输出excellon2
+            for drill_layer in drill_layers:
+                layer_stime = (int(time.time()))
+                drillname = step_path + '\\' + drill_layer
+
+                if drill_layer in rout_layers:
+                    Print.print_with_delimiter("我是rout")
+                    drill_info = epcam_api.rout2file(job_ep_name, step, drill_layer, drillname)
+                else:
+                    drill_info = epcam_api.drill2file(job_ep_name, step, drill_layer, drillname, False)
+                layer_etime = (int(time.time()))
+                layer_time = layer_etime - layer_stime
+                value[layer] = layer_time
+
+        # 记录下输出step的时间
+        end_time = (int(time.time()))
+        time_time = end_time - start_time
+        value["step_time"] = time_time
+        job_result[step] = value
+        print('job_result:', job_result)
+        out_put.append(job_result)
+        print('out_put:', out_put)
+        out_path = os.path.join(temp_out_put_gerber_path, 'out_put' + '.json')
+        if out_json == '':
+            with open(out_path, 'w+') as f:  # 不能是a,w+会覆盖原有的，a只会追加
+                f.write(json.dumps(out_put, sort_keys=True, indent=4, separators=(',', ': ')))
+        else:
+            with open(out_json, 'r') as h:
+                ret_json = json.load(h)
+                ret_json.append(job_result)
+                with open(out_json, 'w+') as hh:
+                    hh.write(json.dumps(ret_json, sort_keys=True, indent=4, separators=(',', ': ')))
+        epcam_api.close_job(job_ep_name)
+
+        Print.print_with_delimiter('输出gerber完成')
+
+        # ----------------------------------------开始测试输出gerber功能--------------------------------------------------------
+
+
+
+        # ----------------------------------------开始验证结果--------------------------------------------------------
 
         Print.print_with_delimiter('比对结果信息展示--开始')
         if g_vs_total_result_flag == True:
