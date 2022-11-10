@@ -24,7 +24,7 @@ def f1():
 
 class MyInput(object):
 
-    def __init__(self,folder_path,job,step,job_id,*,save_path=None):
+    def __init__(self,*,folder_path,job,step,job_id,save_path=None):
         self.folder_path = folder_path
         self.job = job
         self.step = step

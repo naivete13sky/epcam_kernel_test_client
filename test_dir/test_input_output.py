@@ -40,7 +40,11 @@ class TestInputOutputGerber274X:
         job_ep = os.listdir(temp_gerber_path)[0].lower()  + '_ep'
         step = r'orig'
         save_path = temp_ep_path
-        MyInput(folder_path, job_ep, step,job_id,save_path=save_path)
+        MyInput(folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower()),
+                job = os.listdir(temp_gerber_path)[0].lower()  + '_ep',
+                step = r'orig',
+                job_id = job_id,
+                save_path = temp_ep_path)
 
         # 获取 job_ep 的层别信息
         print("job_ep:", job_ep)
