@@ -22,8 +22,7 @@ class TestInputOutputGerber274X:
 
         g = RunConfig.driver_g#拿到G软件
 
-        data = {}#存放当前测试料号的每一层的比对结果。
-        g_vs_total_result_flag = True  # True表示最新一次G比对通过
+        data = {}#存放比对结果信息
         vs_time_g = str(int(time.time()))#比对时间
         data["vs_time_g"] = vs_time_g#比对时间存入字典
         data["job_id"] = job_id
@@ -35,16 +34,11 @@ class TestInputOutputGerber274X:
         temp_g_path = os.path.join(temp_path, 'g')
 
         # 悦谱转图。先下载并解压原始gerber文件。然后转图。
-        DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
-        folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower())
-        job_ep = os.listdir(temp_gerber_path)[0].lower()  + '_ep'
-        step = r'orig'
-        save_path = temp_ep_path
+        job_ep = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='rar')
+
         MyInput(folder_path = os.path.join(temp_gerber_path,os.listdir(temp_gerber_path)[0].lower()),
                 job = os.listdir(temp_gerber_path)[0].lower()  + '_ep',
-                step = r'orig',
-                job_id = job_id,
-                save_path = temp_ep_path)
+                step = r'orig',job_id = job_id,save_path = temp_ep_path)
 
         # 获取 job_ep 的层别信息
         print("job_ep:", job_ep)
@@ -71,6 +65,7 @@ class TestInputOutputGerber274X:
 
         # ----------------------------------------开始比图：G与EP--------------------------------------------------------
         print('比图--G转图VS悦谱转图'.center(190,'-'))
+        g_vs_total_result_flag = True  # True表示最新一次G比对通过
         job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/g/{}'.format('temp' + "_" + str(job_id) + "_" + vs_time_g, job_g)
         job_ep_remote_path = r'\\vmware-host\Shared Folders\share/{}/ep/{}'.format('temp' + "_" + str(job_id) + "_" + vs_time_g, job_ep)
 

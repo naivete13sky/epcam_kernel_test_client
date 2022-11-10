@@ -170,6 +170,7 @@ class DMS():
                     # 删除gerber压缩包
                     if os.path.exists(temp_compressed):
                         os.remove(temp_compressed)
+                return os.listdir(temp_gerber_path)[0].lower()  + '_ep'
 
             # 如果下载的是G转图的tgz
             if kwargs['field'] == 'file_odb_g':
