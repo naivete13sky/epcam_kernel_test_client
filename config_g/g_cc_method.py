@@ -1,3 +1,4 @@
+import json
 import os,shutil
 import subprocess
 import time
@@ -432,6 +433,68 @@ class G():
                 print('inner error')
                 return results
         time.sleep(1)
+
+    def layer_compare_dms(self,*args,job_id,vs_time_g,temp_path,job1,all_layers_list_job1,job2,all_layers_list_job2,**kwargs):
+        global g_vs_total_result_flag
+        data_g = {}
+        g_vs_total_result_flag = True  # True表示最新一次G比对通过
+        # 读取配置文件
+        with open(r'C:\cc\python\epwork\epcam_kernel_test_client\config_g\config.json', encoding='utf-8') as f:
+            cfg = json.load(f)
+        tol = cfg['job_manage']['vs']['vs_tol_g']
+        map_layer_res = cfg['job_manage']['vs']['map_layer_res']
+
+
+        # G打开要比图的2个料号
+        self.layer_compare_g_open_2_job(job1=job1, step='orig', job2=job2)
+        g_compare_result_folder = 'g_compare_result'
+        temp_g_compare_result_path = os.path.join(temp_path, g_compare_result_folder)
+        if not os.path.exists(temp_g_compare_result_path):
+            os.mkdir(temp_g_compare_result_path)
+        temp_path_remote_g_compare_result = r'//vmware-host/Shared Folders/share/{}/{}'.format(
+            'temp' + "_" + str(job_id) + "_" + vs_time_g, g_compare_result_folder)
+        temp_path_local_g_compare_result = os.path.join(temp_path, g_compare_result_folder)
+
+        all_result_g = {}
+        for layer in all_layers_list_job1:
+            if layer in all_layers_list_job2:
+                map_layer = layer + '-com'
+                result = self.layer_compare_one_layer(job1=job1, step1='orig', layer1=layer, job2=job2,
+                                                   step2='orig', layer2=layer, layer2_ext='_copy', tol=tol,
+                                                   map_layer=map_layer, map_layer_res=map_layer_res,
+                                                   result_path_remote=temp_path_remote_g_compare_result,
+                                                   result_path_local=temp_path_local_g_compare_result,
+                                                   temp_path=temp_path)
+                all_result_g[layer] = result
+                if result != "正常":
+                    g_vs_total_result_flag = False
+            else:
+                print("悦谱转图中没有此层")
+        data_g['all_result_g'] = all_result_g
+        self.save_job(job1)
+        self.save_job(job2)
+        self.layer_compare_close_job(job1=job1, job2=job2)
+
+        # 开始查看比对结果
+        # 获取原始层文件信息，最全的
+        all_layer_from_org = [each for each in DMS().get_job_layer_fields_from_dms_db_pandas(job_id, field='layer_org')]
+        all_result = {}  # all_result存放原始文件中所有层的比对信息
+        for layer_org in all_layer_from_org:
+            layer_org_find_flag = False
+            layer_org_vs_value = ''
+            for each_layer_g_result in all_result_g:
+                if each_layer_g_result == str(layer_org).lower().replace(" ", "-").replace("(", "-").replace(")", "-"):
+                    layer_org_find_flag = True
+                    layer_org_vs_value = all_result_g[each_layer_g_result]
+            if layer_org_find_flag == True:
+                all_result[layer_org] = layer_org_vs_value
+            else:
+                all_result[layer_org] = 'G转图中无此层'
+        data_g['all_result'] = all_result
+
+        data_g['g_vs_total_result_flag'] = g_vs_total_result_flag
+
+        return data_g
 
     def clean_g(self, paras):
         print("begin clean!")
