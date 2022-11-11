@@ -1,18 +1,9 @@
 import os, time,json,shutil,sys
-from cc import cc_method
 from cc.cc_method import GetTestData,DMS,Print,getFlist
 import pytest
-from config_g.g_cc_method import G
 from config import RunConfig
-from pathlib import Path
-
-from epcam_api import Input, GUI,Output,BASE
+from epcam_api import Input, GUI
 from epcam_api.Action import Information
-from epcam_api.Edition import Matrix,Job
-
-
-from config_ep.epcam import epcam
-
 from config_ep.epcam_cc_method import MyInput,MyOutput
 
 class TestInputOutputGerber274X:
@@ -69,7 +60,7 @@ class TestInputOutputGerber274X:
         job_g2 = os.listdir(temp_gerber_path)[0].lower() + '_g2'  # epcam输出gerber，再用g软件input。
         step = 'orig'
         file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
-        gerberList = cc_method.getFlist(file_path)
+        gerberList = getFlist(file_path)
         print(gerberList)
         g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
         gerberList_path = []
