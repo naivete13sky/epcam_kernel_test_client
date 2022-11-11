@@ -157,6 +157,12 @@ def prepare_test_job_clean_g():
 
 
 
+def pytest_configure(config):
+    marker_list = [
+        'input_output','output'
+    ]
+    for markers in marker_list:
+        config.addinivalue_line('markers',markers)
 
 if __name__ == "__main__":
     capture_screenshots("test_dir/test_baidu_search.test_search_python.png")

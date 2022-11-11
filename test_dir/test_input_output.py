@@ -1,12 +1,12 @@
-import os, time,json,shutil,sys
-from cc.cc_method import GetTestData,DMS,Print,getFlist
-import pytest
+import pytest,os, time,json,shutil,sys
 from config import RunConfig
+from cc.cc_method import GetTestData,DMS,Print,getFlist
+from config_ep.epcam_cc_method import MyInput,MyOutput
 from epcam_api import Input, GUI
 from epcam_api.Action import Information
-from config_ep.epcam_cc_method import MyInput,MyOutput
 
-class TestInputOutputGerber274X:
+@pytest.mark.input_output
+class TestInputOutputBasicGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Input_Output'))
     def test_input_output_gerber274x(self,job_id,prepare_test_job_clean_g):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
@@ -133,4 +133,21 @@ class TestInputOutputGerber274X:
         Print.print_with_delimiter("断言--结束")
 
 
+@pytest.mark.output
+class TestOutputGerber274X:
+    @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
+    def test_output_gerber274x(self, job_id, prepare_test_job_clean_g):
+        '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
 
+        g = RunConfig.driver_g  # 拿到G软件
+
+        data = {}  # 存放比对结果信息
+        vs_time_g = str(int(time.time()))  # 比对时间
+        data["vs_time_g"] = vs_time_g  # 比对时间存入字典
+        data["job_id"] = job_id
+
+        # 取到临时目录
+        temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
+        temp_gerber_path = os.path.join(temp_path, 'gerber')
+        temp_ep_path = os.path.join(temp_path, 'ep')
+        temp_g_path = os.path.join(temp_path, 'g')
