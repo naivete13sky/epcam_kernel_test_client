@@ -132,7 +132,6 @@ class TestInputOutputBasicGerber274X:
             assert data['all_result_g1'][key] == "正常"
         Print.print_with_delimiter("断言--结束")
 
-
 @pytest.mark.output
 class TestOutputGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
@@ -151,3 +150,9 @@ class TestOutputGerber274X:
         temp_gerber_path = os.path.join(temp_path, 'gerber')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
+
+        # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
+        print(job_id)
+        job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
+
+

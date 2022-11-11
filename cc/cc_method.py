@@ -146,31 +146,34 @@ class DMS():
             print('field:',kwargs['field'])
             #如果下载的是整理过的gerber压缩包
             if kwargs['field'] == 'file_compressed':
-                temp_gerber_path = os.path.join(temp_path, 'gerber')
-                if not os.path.exists(temp_gerber_path):
-                    os.mkdir(temp_gerber_path)
+                temp_compressed_path = os.path.join(temp_path, 'gerber')
+                if not os.path.exists(temp_compressed_path):
+                    os.mkdir(temp_compressed_path)
                 temp_ep_path = os.path.join(temp_path, 'ep')
                 if not os.path.exists(temp_ep_path):
                     os.mkdir(temp_ep_path)
-                file_gerber_name = job_current_all_fields['file_compressed'].split("/")[1]
+                file_compressed_name = job_current_all_fields['file_compressed'].split("/")[1]
 
                 # 下载并解压原始gerber文件
-                if not os.path.exists(os.path.join(temp_gerber_path, file_gerber_name)):
+                if not os.path.exists(os.path.join(temp_compressed_path, file_compressed_name)):
                     print("not have")
-                    self.file_downloand(os.path.join(temp_gerber_path, file_gerber_name), temp_gerber_path)
+                    self.file_downloand(os.path.join(temp_compressed_path, file_compressed_name), temp_compressed_path)
 
                 if 'decompress' in kwargs:
-                    print('decompress',kwargs['decompress'])
-                    time.sleep(0.1)
-                    file_compressed_file_path = os.listdir(temp_gerber_path)[0]
-                    print("file_compressed_file_path:", file_compressed_file_path)
-                    temp_compressed = os.path.join(temp_gerber_path, file_gerber_name)
-                    rf = rarfile.RarFile(temp_compressed)
-                    rf.extractall(temp_gerber_path)
-                    # 删除gerber压缩包
-                    if os.path.exists(temp_compressed):
-                        os.remove(temp_compressed)
-                return os.listdir(temp_gerber_path)[0].lower()  + '_ep'
+                    if kwargs['decompress'] == 'rar':
+                        print('decompress',kwargs['decompress'])
+                        time.sleep(0.1)
+                        file_compressed_file_path = os.listdir(temp_compressed_path)[0]
+                        print("file_compressed_file_path:", file_compressed_file_path)
+                        temp_compressed = os.path.join(temp_compressed_path, file_compressed_name)
+                        rf = rarfile.RarFile(temp_compressed)
+                        rf.extractall(temp_compressed_path)
+                        # 删除gerber压缩包
+                        if os.path.exists(temp_compressed):
+                            os.remove(temp_compressed)
+                        return os.listdir(temp_compressed_path)[0].lower()  + '_ep'
+
+
 
             # 如果下载的是G转图的tgz
             if kwargs['field'] == 'file_odb_g':
