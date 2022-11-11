@@ -146,7 +146,7 @@ class DMS():
             print('field:',kwargs['field'])
             #如果下载的是整理过的gerber压缩包
             if kwargs['field'] == 'file_compressed':
-                temp_compressed_path = os.path.join(temp_path, 'gerber')
+                temp_compressed_path = os.path.join(temp_path, 'compressed')
                 if not os.path.exists(temp_compressed_path):
                     os.mkdir(temp_compressed_path)
                 temp_ep_path = os.path.join(temp_path, 'ep')

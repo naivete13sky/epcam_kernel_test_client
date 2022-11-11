@@ -20,7 +20,7 @@ class TestInputOutputBasicGerber274X:
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
-        temp_gerber_path = os.path.join(temp_path, 'gerber')
+        temp_gerber_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
 
