@@ -13,7 +13,7 @@ from epcam_api.Edition import Matrix,Job
 
 from config_ep.epcam import epcam
 
-from config_ep.epcam_cc_method import MyInput
+from config_ep.epcam_cc_method import MyInput,MyOutput
 
 class TestInputOutputGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Input_Output'))
@@ -61,132 +61,8 @@ class TestInputOutputGerber274X:
         assert len(all_layers_list_job_g) == len(r['all_result_g'])
 
         # ----------------------------------------开始测试输出gerber功能---------------------------------------------------
-        out_put = []
-        job_result = {}
-        out_json = ''
+        MyOutput(temp_path = temp_path, job = job_ep, job_id = job_id)
 
-        # 建立output_gerber文件夹，里面用来放epcam输出的gerber。
-        temp_out_put_gerber_path = os.path.join(temp_path, 'output_gerber')
-        if os.path.exists(temp_out_put_gerber_path):
-            shutil.rmtree(temp_out_put_gerber_path)
-        os.mkdir(temp_out_put_gerber_path)
-
-        # 设置导出参数
-        with open(RunConfig.config_ep_output, 'r') as cfg:
-            infos_ = json.load(cfg)['paras']  # (json格式数据)字符串 转化 为字典
-            _type = infos_['type']
-            resize = infos_['resize']
-            gdsdbu = infos_['gdsdbu']
-            angle = infos_['angle']
-            scalingX = infos_['scalingX']
-            scalingY = infos_['scalingY']
-            isReverse = infos_['isReverse']
-            mirror = infos_['mirror']
-            rotate = infos_['rotate']
-            scale = infos_['scale']
-            profiletop = infos_['profiletop']
-            cw = infos_['cw']
-            cutprofile = infos_['cutprofile']
-            mirrorpointX = infos_['mirrorpointX']
-            mirrorpointY = infos_['mirrorpointY']
-            rotatepointX = infos_['rotatepointX']
-            rotatepointY = infos_['rotatepointY']
-            scalepointX = infos_['scalepointX']
-            scalepointY = infos_['scalepointY']
-            mirrordirection = infos_['mirrordirection']
-            cut_polygon = infos_['cut_polygon']
-            mirrorX = infos_['mirrorX']
-            mirrorY = infos_['mirrorY']
-
-
-        layers = Information.get_layers(job_ep)
-        steps = Information.get_steps(job_ep)
-        file_path = os.path.join(temp_out_put_gerber_path,job_ep)
-        file_path_file = Path(file_path)
-        if file_path_file.exists():
-            shutil.rmtree(file_path_file)  # 已存在gerber文件夹删除掉，再新建
-        os.mkdir(file_path)
-
-
-        for step in steps:
-            value = {}
-            # 开始时间
-            start_time = (int(time.time()))
-            # 创建料的step文件夹
-            step_path = os.path.join(file_path, step)
-            os.mkdir(step_path)
-
-            drill_layers = [each.lower() for each in
-                            DMS().get_job_layer_drill_from_dms_db_pandas_one_job(job_id)['layer']]
-            rout_layers = [each.lower() for each in
-                           DMS().get_job_layer_rout_from_dms_db_pandas_one_job(job_id)['layer']]
-            print("drill_layers:", drill_layers)
-
-            #common_layers_list是非孔类型的文件
-            common_layers_list = []
-            layer_result = {}
-
-            for each_layer in layers:
-                if each_layer not in drill_layers:
-                    common_layers_list.append(each_layer)
-
-            # 输出gerber
-            for layer in common_layers_list:
-                layer_stime = (int(time.time()))
-                filename = os.path.join(step_path,layer)# 当前step下的每个层的gerber文件路径
-                ret = Output.save_gerber(job_ep, step, layer, filename, resize, angle, scalingX,scalingY,mirror, rotate, scale,cw,
-                                         mirrorpointX,mirrorpointY,rotatepointX,rotatepointY, scalepointX, scalepointY, mirrorX, mirrorY)
-                layer_etime = (int(time.time()))
-                layer_time = layer_etime - layer_stime
-                value[layer] = layer_time
-
-            # 输出excellon2
-            for drill_layer in drill_layers:
-
-                layer_stime = (int(time.time()))
-
-                drill_out_path = os.path.join(step_path,drill_layer)
-
-                if drill_layer in rout_layers:
-                    Print.print_with_delimiter("我是rout")
-                    Matrix.change_matrix_row(job_ep, drill_layer, 'board', 'rout', drill_layer)
-                    drill_info = Output.save_rout(job_ep, step, drill_layer, drill_out_path, number_format_l=2, number_format_r=4, zeroes=2, unit=0,
-                                                  tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0, break_arcs = False)
-                else:
-                    Print.print_with_delimiter("我是drill啊")
-                    Matrix.change_matrix_row(job_ep, drill_layer, 'board', 'drill', drill_layer)
-                    # drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
-                    drill_info = BASE.drill2file(job_ep, step, drill_layer,drill_out_path,isMetric = False,number_format_l=2,number_format_r=4,
-                    zeroes=2,unit=0,x_scale=1,y_scale=1,x_anchor=0,y_anchor=0, manufacator = '', tools_order = [])
-                    # print("drill_info:",drill_info)
-                layer_etime = (int(time.time()))
-                layer_time = layer_etime - layer_stime
-                value[layer] = layer_time
-
-
-        # 记录下输出step的时间
-        end_time = (int(time.time()))
-        time_time = end_time - start_time
-        value["step_time"] = time_time
-        job_result[step] = value
-        print('job_result:', job_result)
-        out_put.append(job_result)
-        print('out_put:', out_put)
-        out_path = os.path.join(temp_out_put_gerber_path, 'out_put' + '.json')
-        if out_json == '':
-            with open(out_path, 'w+') as f:  # 不能是a,w+会覆盖原有的，a只会追加
-                f.write(json.dumps(out_put, sort_keys=True, indent=4, separators=(',', ': ')))
-        else:
-            with open(out_json, 'r') as h:
-                ret_json = json.load(h)
-                ret_json.append(job_result)
-                with open(out_json, 'w+') as hh:
-                    hh.write(json.dumps(ret_json, sort_keys=True, indent=4, separators=(',', ': ')))
-
-        # GUI.show_layer(job_ep, "orig", "layer")
-        Job.close_job(job_ep)
-
-        Print.print_with_delimiter('输出gerber完成')
 
         # ----------------------------------------开始用G软件input--------------------------------------------------------
         ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job_ep, r'orig')
