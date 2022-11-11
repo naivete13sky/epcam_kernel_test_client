@@ -147,12 +147,17 @@ class TestOutputGerber274X:
 
         # 取到临时目录
         temp_path = RunConfig.temp_path_base + "_" + str(job_id) + "_" + vs_time_g
-        temp_gerber_path = os.path.join(temp_path, 'gerber')
+        temp_compressed_path = os.path.join(temp_path, 'compressed')
         temp_ep_path = os.path.join(temp_path, 'ep')
         temp_g_path = os.path.join(temp_path, 'g')
 
         # --------------------------------下载测试资料--tgz文件，并解压完，文件夹名称作为料号名称-------------------------------
-        print(job_id)
         job = DMS().get_file_from_dms_db(temp_path, job_id, field='file_compressed', decompress='tgz')
 
+        # 用悦谱CAM打开料号
+        Input.open_job(job, temp_compressed_path)  # 用悦谱CAM打开料号
+        all_layers_list_job = Information.get_layers(job)
+        print('all_layer_list_job:',all_layers_list_job)
 
+        #导出
+        MyOutput(temp_path=temp_path, job=job, job_id=job_id)

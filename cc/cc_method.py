@@ -160,18 +160,26 @@ class DMS():
                     self.file_downloand(os.path.join(temp_compressed_path, file_compressed_name), temp_compressed_path)
 
                 if 'decompress' in kwargs:
+                    print('decompress', kwargs['decompress'])
+                    time.sleep(0.1)
+                    file_compressed_file_path = os.listdir(temp_compressed_path)[0]
+                    print("file_compressed_file_path:", file_compressed_file_path)
+                    temp_compressed = os.path.join(temp_compressed_path, file_compressed_name)
                     if kwargs['decompress'] == 'rar':
-                        print('decompress',kwargs['decompress'])
-                        time.sleep(0.1)
-                        file_compressed_file_path = os.listdir(temp_compressed_path)[0]
-                        print("file_compressed_file_path:", file_compressed_file_path)
-                        temp_compressed = os.path.join(temp_compressed_path, file_compressed_name)
                         rf = rarfile.RarFile(temp_compressed)
                         rf.extractall(temp_compressed_path)
-                        # 删除gerber压缩包
+                        # 删除压缩包
                         if os.path.exists(temp_compressed):
                             os.remove(temp_compressed)
                         return os.listdir(temp_compressed_path)[0].lower()  + '_ep'
+
+                    if kwargs['decompress'] == 'tgz':
+                        pass
+                        CompressTool.untgz(os.path.join(temp_compressed_path, os.listdir(temp_compressed_path)[0]), temp_compressed_path)
+                        if os.path.exists(os.path.join(temp_compressed_path, file_compressed_file_path)):
+                            os.remove(os.path.join(temp_compressed_path, file_compressed_file_path))
+                        return os.listdir(temp_compressed_path)[0].lower()
+
 
 
 
