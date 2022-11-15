@@ -130,7 +130,7 @@ class MyOutput(object):
 
 
     def set_para(self):
-        pass
+
         # 设置导出参数
         with open(RunConfig.config_ep_output, 'r') as cfg:
             infos_ = json.load(cfg)['paras']  # (json格式数据)字符串 转化 为字典

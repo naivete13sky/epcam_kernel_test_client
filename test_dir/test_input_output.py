@@ -161,3 +161,52 @@ class TestOutputGerber274X:
 
         #导出
         MyOutput(temp_path=temp_path, job=job, job_id=job_id)
+
+        # ----------------------------------------开始用G软件input--------------------------------------------------------
+        ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job, r'orig')
+        job_g2 = os.listdir(temp_compressed_path)[0].lower() + '_g2'  # epcam输出gerber，再用g软件input。
+        step = 'orig'
+        file_path = os.path.join(temp_path, ep_out_put_gerber_folder)
+        gerberList = getFlist(file_path)
+        print(gerberList)
+        g_temp_path = r'//vmware-host/Shared Folders/share/temp_{}_{}'.format(job_id, vs_time_g)
+        gerberList_path = []
+        for each in gerberList:
+            gerberList_path.append(os.path.join(g_temp_path, r'output_gerber', job, r'orig', each))
+        print(gerberList_path)
+
+        temp_out_put_gerber_g_input_path = os.path.join(temp_path, 'g2')
+        if os.path.exists(temp_out_put_gerber_g_input_path):
+            shutil.rmtree(temp_out_put_gerber_g_input_path)
+        os.mkdir(temp_out_put_gerber_g_input_path)
+        out_path = temp_out_put_gerber_g_input_path
+
+        g.g_Gerber2Odb2_no_django(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
+        # 输出tgz到指定目录
+        g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
+
+        # ----------------------------------------开始用G软件比图，g与g2---------------------------------------------------
+        # 先导入
+        job_g_remote_path = r'\\vmware-host\Shared Folders\share/{}/compressed/{}'.format(
+            'temp' + "_" + str(job_id) + "_" + vs_time_g, job)
+        # 导入要比图的资料
+        g.import_odb_folder(job_g_remote_path)
+
+        # 校正孔用
+        temp_path_local_info1 = os.path.join(temp_path, 'info1')
+        if not os.path.exists(temp_path_local_info1):
+            os.mkdir(temp_path_local_info1)
+        temp_path_local_info2 = os.path.join(temp_path, 'info2')
+        if not os.path.exists(temp_path_local_info2):
+            os.mkdir(temp_path_local_info2)
+
+        # 以G转图为主来比对
+        # G打开要比图的2个料号g和g2。g就是原始，g2是悦谱输出的gerber又input得到的
+        r = g.layer_compare_dms(job_id=job_id, vs_time_g=vs_time_g, temp_path=temp_path,
+                                job1=job, all_layers_list_job1=all_layers_list_job, job2=job_g2,
+                                all_layers_list_job2=all_layers_list_job, adjust_position=True)
+        data["all_result_g"] = r['all_result_g']
+        data["all_result"] = r['all_result']
+        data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
+        Print.print_with_delimiter("断言--看一下G转图中的层是不是都有比对结果")
+        assert len(all_layers_list_job) == len(r['all_result_g'])
