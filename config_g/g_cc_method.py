@@ -1022,7 +1022,7 @@ class G():
             result = {'gerber': gerberPath}
             paras['path'] = gerberPath
             paras['layer'] = os.path.basename(gerberPath).lower()
-            ret = self.Gerber2ODB2_no_django(paras, 0,job_id,*args,**kwargs)
+            ret = self.gerber_to_odb_one_file(paras, 0,job_id,*args,**kwargs)
             result['result'] = ret
             results.append(result)
         self.gerber_to_odb_one_file(paras, 1,job_id,*args,**kwargs)#保存
