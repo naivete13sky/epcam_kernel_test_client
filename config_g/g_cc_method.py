@@ -753,7 +753,7 @@ class G():
 
 
 
-    def Gerber2ODB2_no_django(self, paras, _type,job_id,*args,**kwargs):
+    def gerber_to_odb_one_file(self, paras, _type,job_id,*args,**kwargs):
         # print("*"*100,"gerber2odb")
         try:
             path = paras['path']
@@ -833,7 +833,6 @@ class G():
 
             Print.print_with_delimiter("结束定位")
         except:
-            pass
             print("有异常啊！")
         # print("p"*100,path)
 
@@ -984,7 +983,7 @@ class G():
         self.Gerber2ODB2(paras, 1,job_id)#保存
         return results
 
-    def g_Gerber2Odb2_no_django(self,job_name, step, gerberList_path, out_path,job_id,*args,**kwargs):
+    def gerber_to_odb_batch(self,job_name, step, gerberList_path, out_path,job_id,*args,**kwargs):
         paras = {}
         paras['path'] = ''
         paras['job'] = job_name
@@ -1026,7 +1025,7 @@ class G():
             ret = self.Gerber2ODB2_no_django(paras, 0,job_id,*args,**kwargs)
             result['result'] = ret
             results.append(result)
-        self.Gerber2ODB2_no_django(paras, 1,job_id,*args,**kwargs)#保存
+        self.gerber_to_odb_one_file(paras, 1,job_id,*args,**kwargs)#保存
         return results
 
     def g_export(self,job,export_to_path):

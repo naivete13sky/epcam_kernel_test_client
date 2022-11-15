@@ -74,7 +74,7 @@ class TestInputOutputBasicGerber274X:
         os.mkdir(temp_out_put_gerber_g_input_path)
         out_path = temp_out_put_gerber_g_input_path
 
-        g.g_Gerber2Odb2_no_django(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
+        g.gerber_to_odb_batch(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
         # 输出tgz到指定目录
         g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 
@@ -181,7 +181,7 @@ class TestOutputGerber274X:
         os.mkdir(temp_out_put_gerber_g_input_path)
         out_path = temp_out_put_gerber_g_input_path
 
-        g.g_Gerber2Odb2_no_django(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
+        g.gerber_to_odb_batch(job_g2, step, gerberList_path, out_path, job_id, drill_para='epcam_default')
         # 输出tgz到指定目录
         g.g_export(job_g2, os.path.join(g_temp_path, r'g2'))
 
@@ -206,7 +206,26 @@ class TestOutputGerber274X:
                                 job1=job, all_layers_list_job1=all_layers_list_job, job2=job_g2,
                                 all_layers_list_job2=all_layers_list_job, adjust_position=True)
         data["all_result_g"] = r['all_result_g']
-        data["all_result"] = r['all_result']
+
         data['g_vs_total_result_flag'] = r['g_vs_total_result_flag']
         Print.print_with_delimiter("断言--看一下G转图中的层是不是都有比对结果")
         assert len(all_layers_list_job) == len(r['all_result_g'])
+
+        # ----------------------------------------开始验证结果--------------------------------------------------------
+        Print.print_with_delimiter('比对结果信息展示--开始')
+        if data['g_vs_total_result_flag'] == True:
+            print("恭喜您！料号导入比对通过！")
+        if data['g_vs_total_result_flag'] == False:
+            print("Sorry！料号导入比对未通过，请人工检查！")
+        Print.print_with_delimiter('分割线', sign='-')
+        print('G转图的层：', data["all_result_g"])
+
+
+        Print.print_with_delimiter('比对结果信息展示--结束')
+
+        Print.print_with_delimiter("断言--开始")
+        assert data['g_vs_total_result_flag'] == True
+        for key in data['all_result_g']:
+            assert data['all_result_g'][key] == "正常"
+
+        Print.print_with_delimiter("断言--结束")
