@@ -6,9 +6,9 @@ from config_g.g_cc_method import G
 from config import RunConfig
 from pathlib import Path
 
-from epcam_api import Input, GUI
-from epcam_api.Action import Information
-from epcam_api.Edition import Matrix
+from epkernel import Input, GUI
+from epkernel.Action import Information
+from epkernel.Edition import Matrix
 
 
 from config_ep.epcam import epcam

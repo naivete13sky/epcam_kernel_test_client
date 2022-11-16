@@ -2,8 +2,8 @@ import pytest,os, time,json,shutil,sys
 from config import RunConfig
 from cc.cc_method import GetTestData,DMS,Print,getFlist
 from config_ep.epcam_cc_method import MyInput,MyOutput
-from epcam_api import Input, GUI
-from epcam_api.Action import Information
+from epkernel import Input, GUI
+from epkernel.Action import Information
 
 @pytest.mark.input_output
 class TestInputOutputBasicGerber274X:

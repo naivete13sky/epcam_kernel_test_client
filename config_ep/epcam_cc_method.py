@@ -9,9 +9,9 @@ import psycopg2
 from sqlalchemy import create_engine
 
 from config import RunConfig
-from epcam_api import Configuration, Input, GUI,BASE,Output
-from epcam_api.Edition import Job,Matrix
-from epcam_api.Action import Information
+from epkernel import Configuration, Input, GUI,BASE,Output
+from epkernel.Edition import Job,Matrix
+from epkernel.Action import Information
 
 from config_ep.epcam import epcam
 
