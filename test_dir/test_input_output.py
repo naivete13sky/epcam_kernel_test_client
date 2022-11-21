@@ -13,6 +13,7 @@ class TestInputOutputBasicGerber274X:
         本用例测试Gerber274X（包括Excellon2）的导入与导出功能
         fuck
         fuck
+        fuck
         '''
 
         g = RunConfig.driver_g#拿到G软件
