@@ -87,9 +87,9 @@ class G():
             'COM info, out_file={}/{}.txt,args=  -t layer -e {}/{}/{} -m script -d EXISTS'.format(
                 result_path_remote,self.layer1,self.job1,self.step1,self.layer1 + self.layer2_ext
             ),
-            'COM info, out_file={}/{}_com_features_count.txt,args=  -t layer -e {}/{}/{} -m display -d FEAT_HIST\nsource {}/{}_com_features_count.txt'.format(
-                result_path_remote,self.layer1,self.job1,self.step1,self.layer1+'-com',result_path_remote,self.layer1
-            ),
+            # 'COM info, out_file={}/{}_com_features_count.txt,args=  -t layer -e {}/{}/{} -m display -d FEAT_HIST\nsource {}/{}_com_features_count.txt'.format(
+            #     result_path_remote,self.layer1,self.job1,self.step1,self.layer1+'-com',result_path_remote,self.layer1
+            # ),
 
         ]
         for cmd in cmd_list:
@@ -97,14 +97,14 @@ class G():
             ret = self.exec_cmd(cmd)
             results_cmd.append(ret)
 
-        time.sleep(1)
-        # 先看一下-com层是不是空的，如果是空的说明比对操作失败。
-        with open(os.path.join(result_path_local,self.layer1 + '_com_features_count.txt'), 'r') as f:
-            comp_result_count = f.readlines()[0].split(",")[-1].strip()
-        if comp_result_count == 'total=0':
-            print("比对异常！未能比对！")
-            result = '错误'
-            return result
+        # time.sleep(1)
+        # # 先看一下-com层是不是空的，如果是空的说明比对操作失败。
+        # with open(os.path.join(result_path_local,self.layer1 + '_com_features_count.txt'), 'r') as f:
+        #     comp_result_count = f.readlines()[0].split(",")[-1].strip()
+        # if comp_result_count == 'total=0':
+        #     print("比对异常！未能比对！")
+        #     result = '错误'
+        #     return result
 
         # 再看一下是否存在_copy层，如果存在说明比对结果有差异。通过info功能。
         with open(os.path.join(result_path_local,self.layer1 + '.txt'), 'r') as f:
