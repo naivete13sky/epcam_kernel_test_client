@@ -23,3 +23,20 @@ param = {'Coordinates': result_file_identify['parameters']['Coordinates'],
 {'format': 'Gerber274x', 'name': 'Znn-2786693_st.gbr', 'parameters': {'Coordinates': 'Incremental', 'Decimal_numbers': True, 'Number_format_decimal': 3, 'Number_format_integer': 3, 'data_type': 'Ascii', 'fi
 le_size': 60795.0, 'format': 'Gerber274x', 'max_numbers': {'first': 348000016.5291131, 'second': 331328015.7372355}, 'min_numbers': {'first': 0.0, 'second': 0.0}, 'offset_numbers': {'first': 0.0, 'second':
 0.0}, 'separator_char': '*', 'text_line_width': 0.0, 'tool_units': ' ', 'units': 'MM', 'zeroes_omitted': 'Leading'}}
+
+
+
+
+
+# 先看一下-com层是不是空的，如果是空的说明比对操作失败。
+'COM info, out_file={}/{}_com_features_count.txt,args=  -t layer -e {}/{}/{} -m display -d FEATURES\nsource {}/{}_com_features_count.txt'.format(
+                result_path_remote,self.layer1,self.job1,self.step1,self.layer1+'-com',result_path_remote,self.layer1
+            ),
+
+# 先看一下-com层是不是空的，如果是空的说明比对操作失败。
+        with open(os.path.join(result_path_local,self.layer1 + '_com_features_count.txt'), 'r') as f:
+            layer_com_count = len(f.readlines())
+        if layer_com_count < 2:
+            print("比对异常！未能比对！")
+            result = '错误'
+            return result
