@@ -95,7 +95,13 @@ class G():
         for cmd in cmd_list:
             print(cmd)
             ret = self.exec_cmd(cmd)
+            print('ret:',ret)
             results_cmd.append(ret)
+            # if ret == 44011:
+            if ret != 0:
+                result = '比对异常！未能正常比对！请人工检查'
+                return result
+
 
         # time.sleep(1)
         # # 先看一下-com层是不是空的，如果是空的说明比对操作失败。
