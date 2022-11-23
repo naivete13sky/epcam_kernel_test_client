@@ -138,7 +138,7 @@ class TestInputOutputBasicGerber274X:
         Print.print_with_delimiter("断言--结束")
 
 @pytest.mark.output
-class aTestOutputGerber274X:
+class TestOutputGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
     def test_output_gerber274x(self, job_id, prepare_test_job_clean_g):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
