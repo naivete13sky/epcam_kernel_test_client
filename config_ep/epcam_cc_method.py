@@ -124,39 +124,65 @@ class MyOutput(object):
         self.job = job
         self.job_id = job_id
 
-        self.set_para()
+        self.set_para_default()
 
         self.out_put()
 
 
-    def set_para(self):
+    def set_para_default(self):
 
         # 设置导出参数
         with open(RunConfig.config_ep_output, 'r') as cfg:
             infos_ = json.load(cfg)['paras']  # (json格式数据)字符串 转化 为字典
-            self._type = infos_['type']
-            self.resize = infos_['resize']
-            self.gdsdbu = infos_['gdsdbu']
-            self.angle = infos_['angle']
-            self.scalingX = infos_['scalingX']
-            self.scalingY = infos_['scalingY']
-            self.isReverse = infos_['isReverse']
-            self.mirror = infos_['mirror']
-            self.rotate = infos_['rotate']
-            self.scale = infos_['scale']
-            self.profiletop = infos_['profiletop']
-            self.cw = infos_['cw']
-            self.cutprofile = infos_['cutprofile']
-            self.mirrorpointX = infos_['mirrorpointX']
-            self.mirrorpointY = infos_['mirrorpointY']
-            self.rotatepointX = infos_['rotatepointX']
-            self.rotatepointY = infos_['rotatepointY']
-            self.scalepointX = infos_['scalepointX']
-            self.scalepointY = infos_['scalepointY']
-            self.mirrordirection = infos_['mirrordirection']
-            self.cut_polygon = infos_['cut_polygon']
-            self.mirrorX = infos_['mirrorX']
-            self.mirrorY = infos_['mirrorY']
+            # self._type = infos_['type']
+            # self.resize = infos_['resize']
+            # self.gdsdbu = infos_['gdsdbu']
+            # self.angle = infos_['angle']
+            # self.scalingX = infos_['scalingX']
+            # self.scalingY = infos_['scalingY']
+            # self.isReverse = infos_['isReverse']
+            # self.mirror = infos_['mirror']
+            # self.rotate = infos_['rotate']
+            # self.scale = infos_['scale']
+            # self.profiletop = infos_['profiletop']
+            # self.cw = infos_['cw']
+            # self.cutprofile = infos_['cutprofile']
+            # self.mirrorpointX = infos_['mirrorpointX']
+            # self.mirrorpointY = infos_['mirrorpointY']
+            # self.rotatepointX = infos_['rotatepointX']
+            # self.rotatepointY = infos_['rotatepointY']
+            # self.scalepointX = infos_['scalepointX']
+            # self.scalepointY = infos_['scalepointY']
+            # self.mirrordirection = infos_['mirrordirection']
+            # self.cut_polygon = infos_['cut_polygon']
+            # self.mirrorX = infos_['mirrorX']
+            # self.mirrorY = infos_['mirrorY']
+
+            self.para = {}
+            # self.para['_type'] = infos_['type']
+            self.para['resize'] = infos_['resize']
+            self.para['angle'] = infos_['angle']
+            self.para['scalingX'] = infos_['scalingX']
+            self.para['scalingY'] = infos_['scalingY']
+            self.para['mirror'] = infos_['mirror']
+            self.para['rotate'] = infos_['rotate']
+            self.para['scale'] = infos_['scale']
+            self.para['cw'] = infos_['cw']
+            self.para['mirrorpointX'] = infos_['mirrorpointX']
+            self.para['mirrorpointY'] = infos_['mirrorpointY']
+            self.para['rotatepointX'] = infos_['rotatepointX']
+            self.para['rotatepointY'] = infos_['rotatepointY']
+            self.para['scalepointX'] = infos_['scalepointX']
+            self.para['scalepointY'] = infos_['scalepointY']
+            self.para['mirrorX'] = infos_['mirrorX']
+            self.para['mirrorY'] = infos_['mirrorY']
+
+    def set_para_customer(self):
+        pass
+
+
+
+
 
 
     def out_put(self):
@@ -173,30 +199,7 @@ class MyOutput(object):
         os.mkdir(temp_out_put_gerber_path)
 
 
-        #导出Gerber274X参数
-        _type = self._type
-        resize = self.resize
-        gdsdbu = self.gdsdbu
-        angle = self.angle
-        scalingX = self.scalingX
-        scalingY = self.scalingY
-        isReverse = self.isReverse
-        mirror = self.mirror
-        rotate = self.rotate
-        scale = self.scale
-        profiletop = self.profiletop
-        cw = self.cw
-        cutprofile = self.cutprofile
-        mirrorpointX = self.mirrorpointX
-        mirrorpointY = self.mirrorpointY
-        rotatepointX = self.rotatepointX
-        rotatepointY = self.rotatepointY
-        scalepointX = self.scalepointX
-        scalepointY = self.scalepointY
-        mirrordirection = self.mirrordirection
-        cut_polygon = self.cut_polygon
-        mirrorX = self.mirrorX
-        mirrorY = self.mirrorY
+        para = self.para
 
         layers = Information.get_layers(self.job)
         steps = Information.get_steps(self.job)
@@ -232,10 +235,11 @@ class MyOutput(object):
             for layer in common_layers_list:
                 layer_stime = (int(time.time()))
                 filename = os.path.join(step_path, layer)  # 当前step下的每个层的gerber文件路径
-                ret = Output.save_gerber(self.job, step, layer, filename, resize, angle, scalingX, scalingY, mirror,
-                                         rotate, scale, cw,
-                                         mirrorpointX, mirrorpointY, rotatepointX, rotatepointY, scalepointX,
-                                         scalepointY, mirrorX, mirrorY)
+                # ret = Output.save_gerber(self.job, step, layer, filename, resize, angle, scalingX, scalingY, mirror,
+                #                          rotate, scale, cw,
+                #                          mirrorpointX, mirrorpointY, rotatepointX, rotatepointY, scalepointX,
+                #                          scalepointY, mirrorX, mirrorY)
+                ret = Output.save_gerber(self.job, step, layer, filename, **para)
                 layer_etime = (int(time.time()))
                 layer_time = layer_etime - layer_stime
                 value[layer] = layer_time
