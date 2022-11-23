@@ -134,29 +134,6 @@ class MyOutput(object):
         # 设置导出参数
         with open(RunConfig.config_ep_output, 'r') as cfg:
             infos_ = json.load(cfg)['paras']  # (json格式数据)字符串 转化 为字典
-            # self._type = infos_['type']
-            # self.resize = infos_['resize']
-            # self.gdsdbu = infos_['gdsdbu']
-            # self.angle = infos_['angle']
-            # self.scalingX = infos_['scalingX']
-            # self.scalingY = infos_['scalingY']
-            # self.isReverse = infos_['isReverse']
-            # self.mirror = infos_['mirror']
-            # self.rotate = infos_['rotate']
-            # self.scale = infos_['scale']
-            # self.profiletop = infos_['profiletop']
-            # self.cw = infos_['cw']
-            # self.cutprofile = infos_['cutprofile']
-            # self.mirrorpointX = infos_['mirrorpointX']
-            # self.mirrorpointY = infos_['mirrorpointY']
-            # self.rotatepointX = infos_['rotatepointX']
-            # self.rotatepointY = infos_['rotatepointY']
-            # self.scalepointX = infos_['scalepointX']
-            # self.scalepointY = infos_['scalepointY']
-            # self.mirrordirection = infos_['mirrordirection']
-            # self.cut_polygon = infos_['cut_polygon']
-            # self.mirrorX = infos_['mirrorX']
-            # self.mirrorY = infos_['mirrorY']
 
             self.para = {}
             # self.para['_type'] = infos_['type']
@@ -209,67 +186,67 @@ class MyOutput(object):
             shutil.rmtree(file_path_file)  # 已存在gerber文件夹删除掉，再新建
         os.mkdir(file_path)
 
-        for step in steps:
-            value = {}
-            # 开始时间
-            start_time = (int(time.time()))
-            # 创建料的step文件夹
-            step_path = os.path.join(file_path, step)
-            os.mkdir(step_path)
+        step = 'orig'
+        value = {}
+        # 开始时间
+        start_time = (int(time.time()))
+        # 创建料的step文件夹
+        step_path = os.path.join(file_path, step)
+        os.mkdir(step_path)
 
-            drill_layers = [each.lower() for each in
-                            DMS().get_job_layer_drill_from_dms_db_pandas_one_job(self.job_id)['layer']]
-            rout_layers = [each.lower() for each in
-                           DMS().get_job_layer_rout_from_dms_db_pandas_one_job(self.job_id)['layer']]
-            print("drill_layers:", drill_layers)
+        drill_layers = [each.lower() for each in
+                        DMS().get_job_layer_drill_from_dms_db_pandas_one_job(self.job_id)['layer']]
+        rout_layers = [each.lower() for each in
+                       DMS().get_job_layer_rout_from_dms_db_pandas_one_job(self.job_id)['layer']]
+        print("drill_layers:", drill_layers)
 
-            # common_layers_list是非孔类型的文件
-            common_layers_list = []
-            layer_result = {}
+        # common_layers_list是非孔类型的文件
+        common_layers_list = []
+        layer_result = {}
 
-            for each_layer in layers:
-                if each_layer not in drill_layers:
-                    common_layers_list.append(each_layer)
+        for each_layer in layers:
+            if each_layer not in drill_layers:
+                common_layers_list.append(each_layer)
 
-            # 输出gerber
-            for layer in common_layers_list:
-                layer_stime = (int(time.time()))
-                filename = os.path.join(step_path, layer)  # 当前step下的每个层的gerber文件路径
-                # ret = Output.save_gerber(self.job, step, layer, filename, resize, angle, scalingX, scalingY, mirror,
-                #                          rotate, scale, cw,
-                #                          mirrorpointX, mirrorpointY, rotatepointX, rotatepointY, scalepointX,
-                #                          scalepointY, mirrorX, mirrorY)
-                ret = Output.save_gerber(self.job, step, layer, filename, **para)
-                layer_etime = (int(time.time()))
-                layer_time = layer_etime - layer_stime
-                value[layer] = layer_time
+        # 输出gerber
+        for layer in common_layers_list:
+            layer_stime = (int(time.time()))
+            filename = os.path.join(step_path, layer)  # 当前step下的每个层的gerber文件路径
+            # ret = Output.save_gerber(self.job, step, layer, filename, resize, angle, scalingX, scalingY, mirror,
+            #                          rotate, scale, cw,
+            #                          mirrorpointX, mirrorpointY, rotatepointX, rotatepointY, scalepointX,
+            #                          scalepointY, mirrorX, mirrorY)
+            ret = Output.save_gerber(self.job, step, layer, filename, **para)
+            layer_etime = (int(time.time()))
+            layer_time = layer_etime - layer_stime
+            value[layer] = layer_time
 
-            # 输出excellon2
-            for drill_layer in drill_layers:
+        # 输出excellon2
+        for drill_layer in drill_layers:
 
-                layer_stime = (int(time.time()))
+            layer_stime = (int(time.time()))
 
-                drill_out_path = os.path.join(step_path, drill_layer)
+            drill_out_path = os.path.join(step_path, drill_layer)
 
-                if drill_layer in rout_layers:
-                    Print.print_with_delimiter("我是rout")
-                    Matrix.change_matrix_row(self.job, drill_layer, 'board', 'rout', drill_layer)
-                    drill_info = Output.save_rout(self.job, step, drill_layer, drill_out_path, number_format_l=2,
-                                                  number_format_r=4, zeroes=2, unit=0,
-                                                  tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
-                                                  break_arcs=False)
-                else:
-                    Print.print_with_delimiter("我是drill啊")
-                    Matrix.change_matrix_row(self.job, drill_layer, 'board', 'drill', drill_layer)
-                    # drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
-                    drill_info = BASE.drill2file(self.job, step, drill_layer, drill_out_path, isMetric=False,
-                                                 number_format_l=2, number_format_r=4,
-                                                 zeroes=2, unit=0, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
-                                                 manufacator='', tools_order=[])
-                    # print("drill_info:",drill_info)
-                layer_etime = (int(time.time()))
-                layer_time = layer_etime - layer_stime
-                value[layer] = layer_time
+            if drill_layer in rout_layers:
+                Print.print_with_delimiter("我是rout")
+                Matrix.change_matrix_row(self.job, drill_layer, 'board', 'rout', drill_layer)
+                drill_info = Output.save_rout(self.job, step, drill_layer, drill_out_path, number_format_l=2,
+                                              number_format_r=4, zeroes=2, unit=0,
+                                              tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
+                                              break_arcs=False)
+            else:
+                Print.print_with_delimiter("我是drill啊")
+                Matrix.change_matrix_row(self.job, drill_layer, 'board', 'drill', drill_layer)
+                # drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
+                drill_info = BASE.drill2file(self.job, step, drill_layer, drill_out_path, isMetric=False,
+                                             number_format_l=2, number_format_r=4,
+                                             zeroes=2, unit=0, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
+                                             manufacator='', tools_order=[])
+                # print("drill_info:",drill_info)
+            layer_etime = (int(time.time()))
+            layer_time = layer_etime - layer_stime
+            value[layer] = layer_time
 
         # 记录下输出step的时间
         end_time = (int(time.time()))
