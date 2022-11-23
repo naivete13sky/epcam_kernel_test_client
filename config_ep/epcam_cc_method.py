@@ -118,13 +118,15 @@ class MyInput(object):
 
 class MyOutput(object):
 
-    def __init__(self,*,temp_path,job,job_id):
+    def __init__(self,*,temp_path:str,job:str,job_id,customer_para:dict):
         pass
         self.temp_path = temp_path
         self.job = job
         self.job_id = job_id
 
         self.set_para_default()
+
+        self.set_para_customer(customer_para)
 
         self.out_put()
 
@@ -154,10 +156,14 @@ class MyOutput(object):
             self.para['mirrorX'] = infos_['mirrorX']
             self.para['mirrorY'] = infos_['mirrorY']
 
-    def set_para_customer(self):
+    def set_para_customer(self,customer_para:dict):
         pass
-
-
+        print('customer_para:',customer_para)
+        for each in customer_para:
+            print(each)
+            self.para[each] = customer_para[each]
+        print(self.para)
+        print("cc")
 
 
 

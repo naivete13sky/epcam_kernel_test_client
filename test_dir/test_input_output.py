@@ -165,7 +165,11 @@ class TestOutputGerber274X:
         print('all_layer_list_job:',all_layers_list_job)
 
         #导出
-        MyOutput(temp_path=temp_path, job=job, job_id=job_id)
+        customer_para = {}
+        customer_para['numberFormatR'] = 6
+
+
+        MyOutput(temp_path=temp_path, job=job, job_id=job_id,customer_para = customer_para)
 
         # ----------------------------------------开始用G软件input--------------------------------------------------------
         ep_out_put_gerber_folder = os.path.join(temp_path, r'output_gerber', job, r'orig')
