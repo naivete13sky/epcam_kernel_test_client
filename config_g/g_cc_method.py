@@ -1137,50 +1137,21 @@ class GInput(object):
         self.para['separator'] = '*'
         paras = self.para
         print("paras:::", paras)
-        try:
-            path = paras['path']
-            job = paras['job']
-            # step = paras['step']
-            # format = paras['format']
-            # data_type = paras['data_type']
-            # units = paras['units']
-            # coordinates = paras['coordinates']
-            # zeroes = paras['zeroes']
-            nf1 = paras['nf1']
-            nf2 = paras['nf2']
-            decimal = paras['decimal']
-            separator = paras['separator']
-            tool_units = paras['tool_units']
-            layer = paras['layer']
-            print("layer"*10,layer)
-            layer=layer.replace(' ','-').replace('(', '-').replace(')', '-')
-            print("layer" * 10, layer)
-            wheel = paras['wheel']
-            wheel_template = paras['wheel_template']
-            nf_comp = paras['nf_comp']
-            multiplier = paras['multiplier']
-            text_line_width = paras['text_line_width']
-            signed_coords = paras['signed_coords']
-            break_sr = paras['break_sr']
-            drill_only = paras['drill_only']
-            merge_by_rule = paras['merge_by_rule']
-            threshold = paras['threshold']
-            resolution = paras['resolution']
-        except Exception as e:
-            print(e)
-            return False
-
-
-
+        # path = paras['path']
+        # job = paras['job']
+        # layer = paras['layer']
+        print("layer"*10,self.para['layer'])
+        self.para['layer']=self.para['layer'].replace(' ','-').replace('(', '-').replace(')', '-')
+        print("layer" * 10, self.para['layer'])
 
         print("iamcc")
         print('kwargs:',kwargs)
         layer_info_from_obj = kwargs.get('layer_info_from_obj', None)
         if layer_info_from_obj == 'job_tgz_file':
             print(layer_info_from_obj)
-            print('layer:',layer)
+            print('layer:',self.para['layer'])
             print('self.gerber_layers:::',self.gerber_layers)
-            if layer not in self.gerber_layers:
+            if self.para['layer'] not in self.gerber_layers:
                 print("iamdrill")
                 self.para['format'] = 'Excellon2'
                 if 'drill_para' in kwargs:
@@ -1195,11 +1166,11 @@ class GInput(object):
         if layer_info_from_obj == 'dms':
             try:
                 Print.print_with_delimiter("开始定位")
-                print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
-                print(os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
+                print(self.para['path'].replace(' ', '-').replace('(', '-').replace(')', '-'))
+                print(os.path.basename(self.para['path']).replace(' ', '-').replace('(', '-').replace(')', '-'))
 
 
-                layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
+                layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(self.para['path']).replace(' ', '-').replace('(', '-').replace(')', '-'))
 
                 # print('*'*50,'\n',"layer_e2:",layer_e2)
 
@@ -1269,10 +1240,10 @@ class GInput(object):
             ]
         else:
             cmd_list1 = [
-                'COM save_job,job={},override=no'.format(job)
+                'COM save_job,job={},override=no'.format(self.para['job'])
             ]
             cmd_list2 = [
-                'COM save_job,job={},override=no'.format(job)
+                'COM save_job,job={},override=no'.format(self.para['job'])
             ]
 
         for cmd in cmd_list1:
