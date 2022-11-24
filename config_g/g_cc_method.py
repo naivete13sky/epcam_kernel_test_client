@@ -1092,6 +1092,7 @@ class GInput(object):
 
         kw = {}
         kw['layer_info_from_obj'] = self.layer_info_from_obj
+        kw['drill_para'] = self.drill_para
         self.in_put(self.job,self.step,self.gerberList_path,self.out_path,self.job_id,self.drill_para,self.layer_info_from_obj,**kw)
 
 
@@ -1213,6 +1214,7 @@ class GInput(object):
                         nf1 = "2"
                         nf2 = "4"
                         tool_units = 'mm'
+                        separator = 'nl'
 
         try:
 
