@@ -1092,7 +1092,7 @@ class GInput(object):
 
         kw = {}
         kw['layer_info_from_obj'] = self.layer_info_from_obj
-        self.in_put(self.job,self.step,self.gerberList_path,self.out_path,self.job_id,self.drill_para,self.layer_info_from_obj,kw)
+        self.in_put(self.job,self.step,self.gerberList_path,self.out_path,self.job_id,self.drill_para,self.layer_info_from_obj,**kw)
 
 
     def set_para_default(self):
@@ -1195,6 +1195,8 @@ class GInput(object):
 
 
         try:
+            print("iamcc")
+            print(kwargs)
             if 'layer_info_from_obj' in kwargs:
                 print('layer_info_from_obj:cc',kwargs['layer_info_from_obj'])
 
