@@ -3,6 +3,7 @@ import os,shutil
 import subprocess
 import time
 from cc.cc_method import Print,DMS
+from config import RunConfig
 
 LAYER_COMPARE_JSON = 'layer_compare.json'
 
@@ -829,11 +830,8 @@ class G():
                     # print("drill_para2:", kwargs['drill_para'])
                     if kwargs['drill_para'] == 'epcam_default':
                         units = 'inch'
-                        # zeroes = 'trailing'#055s13版本是trailing
-                        # zeroes = 'leading'
                         zeroes = 'none'
                         nf1 = "2"
-                        # nf2 ="6"
                         nf2 = "4"
                         tool_units = 'mm'
                     elif kwargs['drill_para'] == 'from_dms':
@@ -854,11 +852,6 @@ class G():
             Print.print_with_delimiter("结束定位")
         except:
             print("有异常啊！")
-        # print("p"*100,path)
-
-        # if not os.path.exists(path):
-        #     print('{} does not exist'.format(path))
-        #     return False
 
 
 
@@ -880,15 +873,10 @@ class G():
 
         cmd_list1 = []
         cmd_list2 = []
-        # trans_COM = 'COM input_manual_set,path=C:/Users/EPSZ15/Desktop/2222/YH-DT3.9-FM1921_64X64-8SF2-04.GTL,job=6566,step=777,format=Gerber274x,data_type=ascii,units=mm,coordinates=absolute,zeroes=leading,nf1=4,nf2=4,decimal=no,separator=*,tool_units=inch,layer=yh-dt3.9-fm1921_64x64-8sf2-04.gtl,wheel=,wheel_template=,nf_comp=0,multiplier=1,text_line_width=0.0024,signed_coords=no,break_sr=yes,drill_only=no,merge_by_rule=no,threshold=200,resolution=3'
+
         if _type == 0:
             cmd_list1 = [
                 'COM input_manual_reset',
-                # 'COM input_manual_set,path={},job={},step={},format={},data_type{},units={},coordinates={},zeroes={},nf1={},nf2={},decimal={},separator={},\
-                #     tool_units={},layer={},wheel={},wheel_template={},nf_comp={},multiplier={},text_line_width={},signed_coords={},break_sr={},drill_only={},\
-                #     merge_by_rule={},threshold={},resolution={}'.format(path, job, step, format, data_type, units, coordinates, zeroes, nf1, nf2, decimal,
-                #     separator, tool_units, layer, wheel, wheel_template, nf_comp, multiplier, text_line_width, signed_coords, break_sr, drill_only, merge_by_rule,
-                #     threshold, resolution),
                 trans_COM,
                 ('COM input_manual,script_path={}'.format(''))
             ]
@@ -1064,7 +1052,240 @@ class G():
         Print.print_with_delimiter("导出--结束")
         return True
 
+    def get_info_by_info(self,job,*,step='orig',out_file=r'//vmware-host/Shared Folders/share/temp_info/info.txt'):
 
+        cmd_list1 = [
+            'COM info, out_file={},args=  -t step -e {}/{} -m script -d LAYERS_LIST'.format(out_file,job,step),
+        ]
+
+        for cmd in cmd_list1:
+            print(cmd)
+            ret = self.exec_cmd(cmd)
+            print('ret:',ret)
+            if ret != 0:
+                return False
+
+
+class GInput(object):
+
+    def __init__(self, *, job: str,step='orig',gerberList_path:list,out_path, job_id, drill_para,
+                 layer_info_from_obj='dms',
+                 layer_list:list,gerber_layer_list:list,drill_layer_list:list,rout_layer_list:list):
+        self.g = RunConfig.driver_g
+        self.job = job
+        self.step = step
+        self.gerberList_path = gerberList_path
+        self.out_path = out_path
+        self.job_id = job_id
+        self.drill_para = drill_para
+        self.layer_info_from_obj = layer_info_from_obj
+
+        if layer_info_from_obj == 'job_tgz_file':
+            self.layers = layer_list
+            self.gerber_layers = gerber_layer_list
+            self.drill_layers = drill_layer_list
+            self.rout_layers = rout_layer_list
+
+        self.get_current_job_layer_type(layer_info_from_obj)
+
+        self.set_para_default()
+
+        kw = {}
+        kw['layer_info_from_obj'] = self.layer_info_from_obj
+        self.in_put(self.job,self.step,self.gerberList_path,self.out_path,self.job_id,self.drill_para,self.layer_info_from_obj,kw)
+
+
+    def set_para_default(self):
+        # 设置默认参数
+        pass
+
+    def set_para_customer(self,customer_para:dict):
+        pass
+        print('customer_para:',customer_para)
+        for each in customer_para:
+            print(each)
+            self.para[each] = customer_para[each]
+        print(self.para)
+        print("cc")
+
+    def get_current_job_layer_type(self,layer_info_from_obj):
+
+        if layer_info_from_obj == 'dms':
+            pass
+
+    def in_put(self,job_name, step, gerberList_path, out_path,job_id,*args,**kwargs):
+        paras = {}
+        paras['path'] = ''
+        paras['job'] = job_name
+        paras['step'] = step
+        paras['format'] = 'Gerber274x'
+        paras['data_type'] = 'ascii'
+        paras['layer'] = ''
+        paras['units'] = 'mm'
+        paras['coordinates'] = 'absolute'
+        paras['zeroes'] = 'leading'
+        paras['nf1'] = '4'
+        paras['nf2'] = '4'
+        paras['decimal'] = 'no'
+        paras['separator'] = '*'
+        paras['tool_units'] = 'inch'
+        paras['wheel'] = ''
+        paras['wheel_template'] = ''
+        paras['nf_comp'] = '0'
+        paras['multiplier'] = '1'
+        paras['text_line_width'] = '0.0024'
+        paras['signed_coords'] = 'no'
+        paras['break_sr'] = 'yes'
+        paras['drill_only'] = 'no'
+        paras['merge_by_rule'] = 'no'
+        paras['threshold'] = '200'
+        paras['resolution'] = '3'
+        # 先创建job, step
+        jobpath = r'C:\genesis\fw\jobs' + '/' + job_name
+        # print("jobpath"*30,jobpath)
+        results = []
+        if os.path.exists(jobpath):
+            shutil.rmtree(jobpath)
+        self.g.Create_Entity(job_name, step)
+        for gerberPath in gerberList_path:
+            # print("g"*100,gerberPath)
+            result = {'gerber': gerberPath}
+            paras['path'] = gerberPath
+            paras['layer'] = os.path.basename(gerberPath).lower()
+            ret = self.gerber_to_odb_one_file(paras, 0,job_id,*args,**kwargs)
+            result['result'] = ret
+            results.append(result)
+        self.gerber_to_odb_one_file(paras, 1,job_id,*args,**kwargs)#保存
+        return results
+
+
+    def gerber_to_odb_one_file(self, paras, _type,job_id,*args,**kwargs):
+        try:
+            path = paras['path']
+            job = paras['job']
+            step = paras['step']
+            format = paras['format']
+            data_type = paras['data_type']
+            units = paras['units']
+            coordinates = paras['coordinates']
+            zeroes = paras['zeroes']
+            nf1 = paras['nf1']
+            nf2 = paras['nf2']
+            decimal = paras['decimal']
+            separator = paras['separator']
+            tool_units = paras['tool_units']
+            layer = paras['layer']
+            print("layer"*10,layer)
+            layer=layer.replace(' ','-').replace('(', '-').replace(')', '-')
+            print("layer" * 10, layer)
+            wheel = paras['wheel']
+            wheel_template = paras['wheel_template']
+            nf_comp = paras['nf_comp']
+            multiplier = paras['multiplier']
+            text_line_width = paras['text_line_width']
+            signed_coords = paras['signed_coords']
+            break_sr = paras['break_sr']
+            drill_only = paras['drill_only']
+            merge_by_rule = paras['merge_by_rule']
+            threshold = paras['threshold']
+            resolution = paras['resolution']
+        except Exception as e:
+            print(e)
+            return False
+
+
+        try:
+            if 'layer_info_from_obj' in kwargs:
+                print('layer_info_from_obj:cc',kwargs['layer_info_from_obj'])
+
+
+            Print.print_with_delimiter("开始定位")
+            print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
+            print(os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
+
+
+            layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
+
+            # print('*'*50,'\n',"layer_e2:",layer_e2)
+
+            # print("*"*50,'\n','layer_e2.status:',layer_e2.status.values[0],'layer_e2.layer_file_type:',layer_e2.layer_file_type.values[0])
+            if layer_e2.status.values[0] == 'published' and layer_e2.layer_file_type.values[0]=='excellon2':
+                print("我是Excellon2!!!!!")
+                format='Excellon2'
+                if 'drill_para' in kwargs:
+                    # print("drill_para2:", kwargs['drill_para'])
+                    if kwargs['drill_para'] == 'epcam_default':
+                        units = 'inch'
+                        zeroes = 'none'
+                        nf1 = "2"
+                        nf2 = "4"
+                        tool_units = 'mm'
+                    elif kwargs['drill_para'] == 'from_dms':
+                        units=layer_e2.units_g.values[0].lower()
+                        zeroes=layer_e2.zeroes_omitted_g.values[0].lower()
+                        nf1 = int(layer_e2.number_format_A_g.values[0])
+                        nf2 = int(layer_e2.number_format_B_g.values[0])
+                        #g软件的tool_units没有mils选项
+                        if layer_e2.tool_units_g.values[0].lower() == 'mils':
+                            tool_units = 'inch'
+                        else:
+                            tool_units = layer_e2.tool_units_g.values[0].lower()
+
+                separator='nl'
+            else:
+                print("我不是孔Excellon2!")
+
+            Print.print_with_delimiter("结束定位")
+        except:
+            print("有异常啊！")
+
+
+
+
+        trans_COM = 'COM input_manual_set,'
+        trans_COM += 'path={},job={},step={},format={},data_type={},units={},coordinates={},zeroes={},'.format(path.replace("\\","/"),
+                                                                                                               job,
+                                                                                                               step,
+                                                                                                               format,
+                                                                                                               data_type,
+                                                                                                               units,
+                                                                                                               coordinates,
+                                                                                                               zeroes)
+        trans_COM += 'nf1={},nf2={},decimal={},separator={},tool_units={},layer={},wheel={},wheel_template={},'.format(
+            nf1, nf2, decimal, separator, tool_units, layer, wheel, wheel_template)
+        trans_COM += 'nf_comp={},multiplier={},text_line_width={},signed_coords={},break_sr={},drill_only={},'.format(
+            nf_comp, multiplier, text_line_width, signed_coords, break_sr, drill_only)
+        trans_COM += 'merge_by_rule={},threshold={},resolution={}'.format(merge_by_rule, threshold, resolution)
+
+        cmd_list1 = []
+        cmd_list2 = []
+
+        if _type == 0:
+            cmd_list1 = [
+                'COM input_manual_reset',
+                trans_COM,
+                ('COM input_manual,script_path={}'.format(''))
+            ]
+            cmd_list2 = [
+                'COM input_manual_reset',
+                trans_COM,
+                'COM input_manual,script_path={}'.format('')
+            ]
+        else:
+            cmd_list1 = [
+                'COM save_job,job={},override=no'.format(job)
+            ]
+            cmd_list2 = [
+                'COM save_job,job={},override=no'.format(job)
+            ]
+
+        for cmd in cmd_list1:
+            print(cmd)
+            ret = self.g.exec_cmd(cmd)
+            if ret != 0:
+                print('inner error')
+                return False
+        return True
 
 
 class Compress():
