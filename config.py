@@ -75,3 +75,6 @@ class RunConfig:
 
     # 调用G的管道
     gateway_path = r'config_g\bin\gateway.exe'
+
+    # g软件导入默认参数
+    config_g_input = r'config_g\config.json'

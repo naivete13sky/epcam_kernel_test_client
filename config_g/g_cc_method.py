@@ -1067,7 +1067,6 @@ class G():
 
 
 class GInput(object):
-
     def __init__(self, *, job: str,step='orig',gerberList_path:list,out_path, job_id, drill_para,
                  layer_info_from_obj='dms',
                  layer_list:list,gerber_layer_list:list,drill_layer_list:list,rout_layer_list:list):
@@ -1097,8 +1096,11 @@ class GInput(object):
 
 
     def set_para_default(self):
-        # 设置默认参数
-        pass
+        # 设置默认导入参数
+        with open(RunConfig.config_g_input, 'r') as cfg:
+            self.para = json.load(cfg)['input']  # (json格式数据)字符串 转化 为字典
+            print("self.para::",self.para)
+
 
     def set_para_customer(self,customer_para:dict):
         pass
@@ -1110,37 +1112,41 @@ class GInput(object):
         print("cc")
 
     def get_current_job_layer_type(self,layer_info_from_obj):
-
         if layer_info_from_obj == 'dms':
             pass
 
     def in_put(self,job_name, step, gerberList_path, out_path,job_id,*args,**kwargs):
-        paras = {}
-        paras['path'] = ''
+        paras = self.para
         paras['job'] = job_name
         paras['step'] = step
-        paras['format'] = 'Gerber274x'
-        paras['data_type'] = 'ascii'
-        paras['layer'] = ''
-        paras['units'] = 'mm'
-        paras['coordinates'] = 'absolute'
-        paras['zeroes'] = 'leading'
-        paras['nf1'] = '4'
-        paras['nf2'] = '4'
-        paras['decimal'] = 'no'
-        paras['separator'] = '*'
-        paras['tool_units'] = 'inch'
-        paras['wheel'] = ''
-        paras['wheel_template'] = ''
-        paras['nf_comp'] = '0'
-        paras['multiplier'] = '1'
-        paras['text_line_width'] = '0.0024'
-        paras['signed_coords'] = 'no'
-        paras['break_sr'] = 'yes'
-        paras['drill_only'] = 'no'
-        paras['merge_by_rule'] = 'no'
-        paras['threshold'] = '200'
-        paras['resolution'] = '3'
+
+        print("paras:::",paras)
+
+        # paras['path'] = ''
+        # paras['job'] = job_name
+        # paras['step'] = step
+        # paras['format'] = 'Gerber274x'
+        # paras['data_type'] = 'ascii'
+        # paras['layer'] = ''
+        # paras['units'] = 'mm'
+        # paras['coordinates'] = 'absolute'
+        # paras['zeroes'] = 'leading'
+        # paras['nf1'] = '4'
+        # paras['nf2'] = '4'
+        # paras['decimal'] = 'no'
+        # paras['separator'] = '*'
+        # paras['tool_units'] = 'inch'
+        # paras['wheel'] = ''
+        # paras['wheel_template'] = ''
+        # paras['nf_comp'] = '0'
+        # paras['multiplier'] = '1'
+        # paras['text_line_width'] = '0.0024'
+        # paras['signed_coords'] = 'no'
+        # paras['break_sr'] = 'yes'
+        # paras['drill_only'] = 'no'
+        # paras['merge_by_rule'] = 'no'
+        # paras['threshold'] = '200'
+        # paras['resolution'] = '3'
         # 先创建job, step
         jobpath = r'C:\genesis\fw\jobs' + '/' + job_name
         # print("jobpath"*30,jobpath)
