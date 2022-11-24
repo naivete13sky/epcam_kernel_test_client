@@ -1194,12 +1194,27 @@ class GInput(object):
             return False
 
 
-        try:
-            print("iamcc")
-            print(kwargs)
-            if 'layer_info_from_obj' in kwargs:
-                print('layer_info_from_obj:cc',kwargs['layer_info_from_obj'])
 
+
+        print("iamcc")
+        print('kwargs:',kwargs)
+        layer_info_from_obj = kwargs.get('layer_info_from_obj', None)
+        if layer_info_from_obj == 'job_tgz_file':
+            print(layer_info_from_obj)
+            print('layer:',layer)
+            print('self.gerber_layers:::',self.gerber_layers)
+            if layer not in self.gerber_layers:
+                print("iamdrill")
+                format = 'Excellon2'
+                if 'drill_para' in kwargs:
+                    if kwargs['drill_para'] == 'epcam_default':
+                        units = 'inch'
+                        zeroes = 'none'
+                        nf1 = "2"
+                        nf2 = "4"
+                        tool_units = 'mm'
+
+        try:
 
             Print.print_with_delimiter("开始定位")
             print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
