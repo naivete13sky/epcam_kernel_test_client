@@ -1094,13 +1094,11 @@ class GInput(object):
         kw['drill_para'] = self.drill_para
         self.in_put(self.job,self.step,self.gerberList_path,self.out_path,self.job_id,self.drill_para,self.layer_info_from_obj,**kw)
 
-
     def set_para_default(self):
         # 设置默认导入参数
         with open(RunConfig.config_g_input, 'r') as cfg:
             self.para = json.load(cfg)['input']  # (json格式数据)字符串 转化 为字典
             print("self.para::",self.para)
-
 
     def set_para_customer(self,customer_para:dict):
         pass
@@ -1116,7 +1114,6 @@ class GInput(object):
             pass
 
     def in_put(self,job_name, step, gerberList_path, out_path,job_id,*args,**kwargs):
-
         # 先创建job, step
         jobpath = r'C:\genesis\fw\jobs' + '/' + job_name
         results = []
@@ -1125,9 +1122,7 @@ class GInput(object):
         self.g.Create_Entity(job_name, step)
         for gerberPath in gerberList_path:
             result = {'gerber': gerberPath}
-            # paras['path'] = gerberPath
             self.para['path'] = gerberPath
-            # paras['layer'] = os.path.basename(gerberPath).lower()
             self.para['layer'] = os.path.basename(gerberPath).lower()
             ret = self.gerber_to_odb_one_file(0,job_id,*args,**kwargs)
             result['result'] = ret
@@ -1135,21 +1130,22 @@ class GInput(object):
         self.gerber_to_odb_one_file(1,job_id,*args,**kwargs)#保存
         return results
 
-
     def gerber_to_odb_one_file(self, _type,job_id,*args,**kwargs):
         self.para['job'] = self.job
         self.para['step'] = self.step
+        self.para['format'] = 'Gerber274x'
+        self.para['separator'] = '*'
         paras = self.para
         print("paras:::", paras)
         try:
             path = paras['path']
             job = paras['job']
-            step = paras['step']
-            format = paras['format']
-            data_type = paras['data_type']
-            units = paras['units']
-            coordinates = paras['coordinates']
-            zeroes = paras['zeroes']
+            # step = paras['step']
+            # format = paras['format']
+            # data_type = paras['data_type']
+            # units = paras['units']
+            # coordinates = paras['coordinates']
+            # zeroes = paras['zeroes']
             nf1 = paras['nf1']
             nf2 = paras['nf2']
             decimal = paras['decimal']
@@ -1186,15 +1182,15 @@ class GInput(object):
             print('self.gerber_layers:::',self.gerber_layers)
             if layer not in self.gerber_layers:
                 print("iamdrill")
-                format = 'Excellon2'
+                self.para['format'] = 'Excellon2'
                 if 'drill_para' in kwargs:
                     if kwargs['drill_para'] == 'epcam_default':
-                        units = 'inch'
-                        zeroes = 'none'
-                        nf1 = "2"
-                        nf2 = "4"
-                        tool_units = 'mm'
-                        separator = 'nl'
+                        self.para['units'] = 'inch'
+                        self.para['zeroes'] = 'none'
+                        self.para['nf1'] = "2"
+                        self.para['nf2'] = "4"
+                        self.para['tool_units'] = 'mm'
+                        self.para['separator'] = 'nl'
 
         if layer_info_from_obj == 'dms':
             try:
@@ -1214,21 +1210,22 @@ class GInput(object):
                     if 'drill_para' in kwargs:
                         # print("drill_para2:", kwargs['drill_para'])
                         if kwargs['drill_para'] == 'epcam_default':
-                            units = 'inch'
-                            zeroes = 'none'
-                            nf1 = "2"
-                            nf2 = "4"
-                            tool_units = 'mm'
+                            self.para['units'] = 'inch'
+                            self.para['zeroes'] = 'none'
+                            self.para['nf1'] = "2"
+                            self.para['nf2'] = "4"
+                            self.para['tool_units'] = 'mm'
+                            self.para['separator'] = 'nl'
                         elif kwargs['drill_para'] == 'from_dms':
-                            units=layer_e2.units_g.values[0].lower()
-                            zeroes=layer_e2.zeroes_omitted_g.values[0].lower()
-                            nf1 = int(layer_e2.number_format_A_g.values[0])
-                            nf2 = int(layer_e2.number_format_B_g.values[0])
+                            self.para['units']=layer_e2.units_g.values[0].lower()
+                            self.para['zeroes']=layer_e2.zeroes_omitted_g.values[0].lower()
+                            self.para['nf1'] = int(layer_e2.number_format_A_g.values[0])
+                            self.para['nf2'] = int(layer_e2.number_format_B_g.values[0])
                             #g软件的tool_units没有mils选项
                             if layer_e2.tool_units_g.values[0].lower() == 'mils':
-                                tool_units = 'inch'
+                                self.para['tool_units'] = 'inch'
                             else:
-                                tool_units = layer_e2.tool_units_g.values[0].lower()
+                                self.para['tool_units'] = layer_e2.tool_units_g.values[0].lower()
 
                     separator='nl'
                 else:
@@ -1240,19 +1237,23 @@ class GInput(object):
 
 
         trans_COM = 'COM input_manual_set,'
-        trans_COM += 'path={},job={},step={},format={},data_type={},units={},coordinates={},zeroes={},'.format(path.replace("\\","/"),
-                                                                                                               job,
-                                                                                                               step,
-                                                                                                               format,
-                                                                                                               data_type,
-                                                                                                               units,
-                                                                                                               coordinates,
-                                                                                                               zeroes)
+        trans_COM += 'path={},job={},step={},format={},data_type={},units={},coordinates={},zeroes={},'.format(
+            self.para['path'].replace("\\","/"),
+            self.para['job'],
+            self.para['step'],
+            self.para['format'],
+            self.para['data_type'],
+            self.para['units'],
+            self.para['coordinates'],
+            self.para['zeroes'])
         trans_COM += 'nf1={},nf2={},decimal={},separator={},tool_units={},layer={},wheel={},wheel_template={},'.format(
-            nf1, nf2, decimal, separator, tool_units, layer, wheel, wheel_template)
+            self.para['nf1'], self.para['nf2'], self.para['decimal'], self.para['separator'], self.para['tool_units'],
+            self.para['layer'], self.para['wheel'], self.para['wheel_template'])
         trans_COM += 'nf_comp={},multiplier={},text_line_width={},signed_coords={},break_sr={},drill_only={},'.format(
-            nf_comp, multiplier, text_line_width, signed_coords, break_sr, drill_only)
-        trans_COM += 'merge_by_rule={},threshold={},resolution={}'.format(merge_by_rule, threshold, resolution)
+            self.para['nf_comp'], self.para['multiplier'], self.para['text_line_width'], self.para['signed_coords'],
+            self.para['break_sr'], self.para['drill_only'])
+        trans_COM += 'merge_by_rule={},threshold={},resolution={}'.format(
+            self.para['merge_by_rule'], self.para['threshold'], self.para['resolution'])
 
 
         if _type == 0:
