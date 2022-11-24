@@ -124,7 +124,7 @@ class MyOutput(object):
         self.job_id = job_id
         self.layer_info_from_obj = layer_info_from_obj
 
-        self.get_current_job_layer_attribute(layer_info_from_obj)
+        self.get_current_job_layer_type(layer_info_from_obj)
 
         self.set_para_default()
 
@@ -166,7 +166,7 @@ class MyOutput(object):
         print(self.para)
         print("cc")
 
-    def get_current_job_layer_attribute(self,layer_info_from_obj):
+    def get_current_job_layer_type(self,layer_info_from_obj):
         self.layers = Information.get_layers(self.job)
         print('self.layers:', self.layers)
 
@@ -210,9 +210,8 @@ class MyOutput(object):
         step_path = os.path.join(file_path, step)
         os.mkdir(step_path)
 
-        drill_layers = [each.lower() for each in DMS().get_job_layer_drill_from_dms_db_pandas_one_job(self.job_id)['layer']]
-        rout_layers = [each.lower() for each in DMS().get_job_layer_rout_from_dms_db_pandas_one_job(self.job_id)['layer']]
-        print("drill_layers:", drill_layers)
+        drill_layers = self.drill_layers
+        rout_layers = self.rout_layers
 
         common_layers_list = []
         layer_result = {}
