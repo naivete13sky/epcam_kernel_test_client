@@ -117,19 +117,20 @@ class MyInput(object):
         BASE.save_job_as(job, save_path)
 
 class MyOutput(object):
-
-    def __init__(self,*,temp_path:str,job:str,job_id,customer_para:dict):
+    def __init__(self,*,temp_path:str,job:str,job_id,layer_info_from_obj='dms',customer_para:dict):
         pass
         self.temp_path = temp_path
         self.job = job
         self.job_id = job_id
+        self.layer_info_from_obj = layer_info_from_obj
+
+        self.get_current_job_layer_attribute(layer_info_from_obj)
 
         self.set_para_default()
 
         self.set_para_customer(customer_para)
 
         self.out_put()
-
 
     def set_para_default(self):
 
@@ -165,6 +166,22 @@ class MyOutput(object):
         print(self.para)
         print("cc")
 
+    def get_current_job_layer_attribute(self,layer_info_from_obj):
+        pass
+        if layer_info_from_obj == "dms":
+            print('layer_info_from_obj:',layer_info_from_obj)
+
+            self.layers = Information.get_layers(self.job)
+            print('self.layers:',self.layers)
+
+            self.drill_layers = Information.get_layer_info(self.job,context='board',type=['drill'])
+            print('self.drill_layers:', self.drill_layers)
+
+            self.rout_layers = Information.get_layer_info(self.job, context='board', type=['rout'])
+            print('self.rout_layers:', self.rout_layers)
+
+        if layer_info_from_obj == 'job_tgz_file':
+            print('layer_info_from_obj:',layer_info_from_obj)
 
 
 
@@ -172,8 +189,6 @@ class MyOutput(object):
         out_put = []
         job_result = {}
         out_json = ''
-
-
 
         # 建立output_gerber文件夹，里面用来放epcam输出的gerber。
         temp_out_put_gerber_path = os.path.join(self.temp_path, 'output_gerber')
@@ -185,7 +200,6 @@ class MyOutput(object):
         para = self.para
 
         layers = Information.get_layers(self.job)
-        steps = Information.get_steps(self.job)
         file_path = os.path.join(temp_out_put_gerber_path, self.job)
         file_path_file = Path(file_path)
         if file_path_file.exists():
@@ -200,13 +214,10 @@ class MyOutput(object):
         step_path = os.path.join(file_path, step)
         os.mkdir(step_path)
 
-        drill_layers = [each.lower() for each in
-                        DMS().get_job_layer_drill_from_dms_db_pandas_one_job(self.job_id)['layer']]
-        rout_layers = [each.lower() for each in
-                       DMS().get_job_layer_rout_from_dms_db_pandas_one_job(self.job_id)['layer']]
+        drill_layers = [each.lower() for each in DMS().get_job_layer_drill_from_dms_db_pandas_one_job(self.job_id)['layer']]
+        rout_layers = [each.lower() for each in DMS().get_job_layer_rout_from_dms_db_pandas_one_job(self.job_id)['layer']]
         print("drill_layers:", drill_layers)
 
-        # common_layers_list是非孔类型的文件
         common_layers_list = []
         layer_result = {}
 
@@ -218,10 +229,6 @@ class MyOutput(object):
         for layer in common_layers_list:
             layer_stime = (int(time.time()))
             filename = os.path.join(step_path, layer)  # 当前step下的每个层的gerber文件路径
-            # ret = Output.save_gerber(self.job, step, layer, filename, resize, angle, scalingX, scalingY, mirror,
-            #                          rotate, scale, cw,
-            #                          mirrorpointX, mirrorpointY, rotatepointX, rotatepointY, scalepointX,
-            #                          scalepointY, mirrorX, mirrorY)
             ret = Output.save_gerber(self.job, step, layer, filename, **para)
             layer_etime = (int(time.time()))
             layer_time = layer_etime - layer_stime
