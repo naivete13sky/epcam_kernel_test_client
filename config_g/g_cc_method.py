@@ -219,9 +219,6 @@ class G():
             'COM save_job,job={},override=no'.format(job),
         ]
 
-        cmd_list2 = [
-        ]
-
         for cmd in cmd_list1:
             print(cmd)
             ret = self.exec_cmd(cmd)
@@ -1124,21 +1121,20 @@ class GInput(object):
             result = {'gerber': gerberPath}
             self.para['path'] = gerberPath
             self.para['layer'] = os.path.basename(gerberPath).lower()
-            ret = self.gerber_to_odb_one_file(0,job_id,*args,**kwargs)
+            ret = self.gerber_to_odb_one_file(job_id,*args,**kwargs)
             result['result'] = ret
             results.append(result)
-        self.gerber_to_odb_one_file(1,job_id,*args,**kwargs)#保存
+        self.g.save_job(self.job)
         return results
 
-    def gerber_to_odb_one_file(self, _type,job_id,*args,**kwargs):
+    def gerber_to_odb_one_file(self, job_id,*args,**kwargs):
         self.para['job'] = self.job
         self.para['step'] = self.step
         self.para['format'] = 'Gerber274x'
         self.para['separator'] = '*'
         self.para['layer']=self.para['layer'].replace(' ','-').replace('(', '-').replace(')', '-')
 
-        print("iamcc")
-        print('kwargs:',kwargs)
+        print("iamcc",'kwargs:',kwargs)
         layer_info_from_obj = kwargs.get('layer_info_from_obj', None)
         if layer_info_from_obj == 'job_tgz_file':
             print(layer_info_from_obj)
@@ -1204,33 +1200,34 @@ class GInput(object):
             self.para['coordinates'],
             self.para['zeroes'])
         trans_COM += 'nf1={},nf2={},decimal={},separator={},tool_units={},layer={},wheel={},wheel_template={},'.format(
-            self.para['nf1'], self.para['nf2'], self.para['decimal'], self.para['separator'], self.para['tool_units'],
-            self.para['layer'], self.para['wheel'], self.para['wheel_template'])
+            self.para['nf1'],
+            self.para['nf2'],
+            self.para['decimal'],
+            self.para['separator'],
+            self.para['tool_units'],
+            self.para['layer'],
+            self.para['wheel'],
+            self.para['wheel_template'])
         trans_COM += 'nf_comp={},multiplier={},text_line_width={},signed_coords={},break_sr={},drill_only={},'.format(
-            self.para['nf_comp'], self.para['multiplier'], self.para['text_line_width'], self.para['signed_coords'],
-            self.para['break_sr'], self.para['drill_only'])
+            self.para['nf_comp'],
+            self.para['multiplier'],
+            self.para['text_line_width'],
+            self.para['signed_coords'],
+            self.para['break_sr'],
+            self.para['drill_only'])
         trans_COM += 'merge_by_rule={},threshold={},resolution={}'.format(
-            self.para['merge_by_rule'], self.para['threshold'], self.para['resolution'])
+            self.para['merge_by_rule'],
+            self.para['threshold'],
+            self.para['resolution'])
 
 
-        if _type == 0:
-            cmd_list1 = [
-                'COM input_manual_reset',
-                trans_COM,
-                ('COM input_manual,script_path={}'.format(''))
-            ]
-            cmd_list2 = [
-                'COM input_manual_reset',
-                trans_COM,
-                'COM input_manual,script_path={}'.format('')
-            ]
-        else:
-            cmd_list1 = [
-                'COM save_job,job={},override=no'.format(self.para['job'])
-            ]
-            cmd_list2 = [
-                'COM save_job,job={},override=no'.format(self.para['job'])
-            ]
+
+        cmd_list1 = [
+            'COM input_manual_reset',
+            trans_COM,
+            ('COM input_manual,script_path={}'.format(''))
+        ]
+
 
         for cmd in cmd_list1:
             print(cmd)
