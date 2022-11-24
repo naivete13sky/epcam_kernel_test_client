@@ -1135,14 +1135,7 @@ class GInput(object):
         self.para['step'] = self.step
         self.para['format'] = 'Gerber274x'
         self.para['separator'] = '*'
-        paras = self.para
-        print("paras:::", paras)
-        # path = paras['path']
-        # job = paras['job']
-        # layer = paras['layer']
-        print("layer"*10,self.para['layer'])
         self.para['layer']=self.para['layer'].replace(' ','-').replace('(', '-').replace(')', '-')
-        print("layer" * 10, self.para['layer'])
 
         print("iamcc")
         print('kwargs:',kwargs)
@@ -1150,7 +1143,6 @@ class GInput(object):
         if layer_info_from_obj == 'job_tgz_file':
             print(layer_info_from_obj)
             print('layer:',self.para['layer'])
-            print('self.gerber_layers:::',self.gerber_layers)
             if self.para['layer'] not in self.gerber_layers:
                 print("iamdrill")
                 self.para['format'] = 'Excellon2'
@@ -1168,13 +1160,7 @@ class GInput(object):
                 Print.print_with_delimiter("开始定位")
                 print(self.para['path'].replace(' ', '-').replace('(', '-').replace(')', '-'))
                 print(os.path.basename(self.para['path']).replace(' ', '-').replace('(', '-').replace(')', '-'))
-
-
                 layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(self.para['path']).replace(' ', '-').replace('(', '-').replace(')', '-'))
-
-                # print('*'*50,'\n',"layer_e2:",layer_e2)
-
-                # print("*"*50,'\n','layer_e2.status:',layer_e2.status.values[0],'layer_e2.layer_file_type:',layer_e2.layer_file_type.values[0])
                 if layer_e2.status.values[0] == 'published' and layer_e2.layer_file_type.values[0]=='excellon2':
                     print("我是Excellon2!!!!!")
                     format='Excellon2'
@@ -1198,7 +1184,7 @@ class GInput(object):
                             else:
                                 self.para['tool_units'] = layer_e2.tool_units_g.values[0].lower()
 
-                    separator='nl'
+                    self.para['separator']='nl'
                 else:
                     print("我不是孔Excellon2!")
 
