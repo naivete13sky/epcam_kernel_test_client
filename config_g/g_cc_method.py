@@ -1216,49 +1216,49 @@ class GInput(object):
                         tool_units = 'mm'
                         separator = 'nl'
 
-        try:
+        if layer_info_from_obj == 'dms':
+            pass
+            try:
 
-            Print.print_with_delimiter("开始定位")
-            print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
-            print(os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
-
-
-            layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
-
-            # print('*'*50,'\n',"layer_e2:",layer_e2)
-
-            # print("*"*50,'\n','layer_e2.status:',layer_e2.status.values[0],'layer_e2.layer_file_type:',layer_e2.layer_file_type.values[0])
-            if layer_e2.status.values[0] == 'published' and layer_e2.layer_file_type.values[0]=='excellon2':
-                print("我是Excellon2!!!!!")
-                format='Excellon2'
-                if 'drill_para' in kwargs:
-                    # print("drill_para2:", kwargs['drill_para'])
-                    if kwargs['drill_para'] == 'epcam_default':
-                        units = 'inch'
-                        zeroes = 'none'
-                        nf1 = "2"
-                        nf2 = "4"
-                        tool_units = 'mm'
-                    elif kwargs['drill_para'] == 'from_dms':
-                        units=layer_e2.units_g.values[0].lower()
-                        zeroes=layer_e2.zeroes_omitted_g.values[0].lower()
-                        nf1 = int(layer_e2.number_format_A_g.values[0])
-                        nf2 = int(layer_e2.number_format_B_g.values[0])
-                        #g软件的tool_units没有mils选项
-                        if layer_e2.tool_units_g.values[0].lower() == 'mils':
-                            tool_units = 'inch'
-                        else:
-                            tool_units = layer_e2.tool_units_g.values[0].lower()
-
-                separator='nl'
-            else:
-                print("我不是孔Excellon2!")
-
-            Print.print_with_delimiter("结束定位")
-        except:
-            print("有异常啊！")
+                Print.print_with_delimiter("开始定位")
+                print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
+                print(os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
 
 
+                layer_e2=DMS().get_job_layer_fields_from_dms_db_pandas_one_layer(job_id,filter=os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
+
+                # print('*'*50,'\n',"layer_e2:",layer_e2)
+
+                # print("*"*50,'\n','layer_e2.status:',layer_e2.status.values[0],'layer_e2.layer_file_type:',layer_e2.layer_file_type.values[0])
+                if layer_e2.status.values[0] == 'published' and layer_e2.layer_file_type.values[0]=='excellon2':
+                    print("我是Excellon2!!!!!")
+                    format='Excellon2'
+                    if 'drill_para' in kwargs:
+                        # print("drill_para2:", kwargs['drill_para'])
+                        if kwargs['drill_para'] == 'epcam_default':
+                            units = 'inch'
+                            zeroes = 'none'
+                            nf1 = "2"
+                            nf2 = "4"
+                            tool_units = 'mm'
+                        elif kwargs['drill_para'] == 'from_dms':
+                            units=layer_e2.units_g.values[0].lower()
+                            zeroes=layer_e2.zeroes_omitted_g.values[0].lower()
+                            nf1 = int(layer_e2.number_format_A_g.values[0])
+                            nf2 = int(layer_e2.number_format_B_g.values[0])
+                            #g软件的tool_units没有mils选项
+                            if layer_e2.tool_units_g.values[0].lower() == 'mils':
+                                tool_units = 'inch'
+                            else:
+                                tool_units = layer_e2.tool_units_g.values[0].lower()
+
+                    separator='nl'
+                else:
+                    print("我不是孔Excellon2!")
+
+                Print.print_with_delimiter("结束定位")
+            except:
+                print("有异常啊！")
 
 
         trans_COM = 'COM input_manual_set,'
