@@ -57,6 +57,8 @@ class TestInputOutputBasicGerber274X:
         assert len(all_layers_list_job_g) == len(r['all_result_g'])
 
         # ----------------------------------------开始测试输出gerber功能---------------------------------------------------
+        customer_para = {}
+        # customer_para['numberFormatR'] = 6
         MyOutput(temp_path = temp_path, job = job_ep, job_id = job_id)
 
 
