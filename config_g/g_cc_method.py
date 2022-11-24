@@ -1116,57 +1116,31 @@ class GInput(object):
             pass
 
     def in_put(self,job_name, step, gerberList_path, out_path,job_id,*args,**kwargs):
-        paras = self.para
-        paras['job'] = job_name
-        paras['step'] = step
 
-        print("paras:::",paras)
-
-        # paras['path'] = ''
-        # paras['job'] = job_name
-        # paras['step'] = step
-        # paras['format'] = 'Gerber274x'
-        # paras['data_type'] = 'ascii'
-        # paras['layer'] = ''
-        # paras['units'] = 'mm'
-        # paras['coordinates'] = 'absolute'
-        # paras['zeroes'] = 'leading'
-        # paras['nf1'] = '4'
-        # paras['nf2'] = '4'
-        # paras['decimal'] = 'no'
-        # paras['separator'] = '*'
-        # paras['tool_units'] = 'inch'
-        # paras['wheel'] = ''
-        # paras['wheel_template'] = ''
-        # paras['nf_comp'] = '0'
-        # paras['multiplier'] = '1'
-        # paras['text_line_width'] = '0.0024'
-        # paras['signed_coords'] = 'no'
-        # paras['break_sr'] = 'yes'
-        # paras['drill_only'] = 'no'
-        # paras['merge_by_rule'] = 'no'
-        # paras['threshold'] = '200'
-        # paras['resolution'] = '3'
         # 先创建job, step
         jobpath = r'C:\genesis\fw\jobs' + '/' + job_name
-        # print("jobpath"*30,jobpath)
         results = []
         if os.path.exists(jobpath):
             shutil.rmtree(jobpath)
         self.g.Create_Entity(job_name, step)
         for gerberPath in gerberList_path:
-            # print("g"*100,gerberPath)
             result = {'gerber': gerberPath}
-            paras['path'] = gerberPath
-            paras['layer'] = os.path.basename(gerberPath).lower()
-            ret = self.gerber_to_odb_one_file(paras, 0,job_id,*args,**kwargs)
+            # paras['path'] = gerberPath
+            self.para['path'] = gerberPath
+            # paras['layer'] = os.path.basename(gerberPath).lower()
+            self.para['layer'] = os.path.basename(gerberPath).lower()
+            ret = self.gerber_to_odb_one_file(0,job_id,*args,**kwargs)
             result['result'] = ret
             results.append(result)
-        self.gerber_to_odb_one_file(paras, 1,job_id,*args,**kwargs)#保存
+        self.gerber_to_odb_one_file(1,job_id,*args,**kwargs)#保存
         return results
 
 
-    def gerber_to_odb_one_file(self, paras, _type,job_id,*args,**kwargs):
+    def gerber_to_odb_one_file(self, _type,job_id,*args,**kwargs):
+        self.para['job'] = self.job
+        self.para['step'] = self.step
+        paras = self.para
+        print("paras:::", paras)
         try:
             path = paras['path']
             job = paras['job']
@@ -1223,9 +1197,7 @@ class GInput(object):
                         separator = 'nl'
 
         if layer_info_from_obj == 'dms':
-            pass
             try:
-
                 Print.print_with_delimiter("开始定位")
                 print(path.replace(' ', '-').replace('(', '-').replace(')', '-'))
                 print(os.path.basename(path).replace(' ', '-').replace('(', '-').replace(')', '-'))
@@ -1282,8 +1254,6 @@ class GInput(object):
             nf_comp, multiplier, text_line_width, signed_coords, break_sr, drill_only)
         trans_COM += 'merge_by_rule={},threshold={},resolution={}'.format(merge_by_rule, threshold, resolution)
 
-        cmd_list1 = []
-        cmd_list2 = []
 
         if _type == 0:
             cmd_list1 = [
