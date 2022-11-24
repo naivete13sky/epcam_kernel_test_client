@@ -167,23 +167,19 @@ class MyOutput(object):
         print("cc")
 
     def get_current_job_layer_attribute(self,layer_info_from_obj):
-        pass
+        self.layers = Information.get_layers(self.job)
+        print('self.layers:', self.layers)
+
+        print('layer_info_from_obj:', layer_info_from_obj)
         if layer_info_from_obj == "dms":
-            print('layer_info_from_obj:',layer_info_from_obj)
-
-            self.layers = Information.get_layers(self.job)
-            print('self.layers:',self.layers)
-
-            self.drill_layers = Information.get_layer_info(self.job,context='board',type=['drill'])
-            print('self.drill_layers:', self.drill_layers)
-
-            self.rout_layers = Information.get_layer_info(self.job, context='board', type=['rout'])
-            print('self.rout_layers:', self.rout_layers)
-
+            self.drill_layers = [each.lower() for each in DMS().get_job_layer_drill_from_dms_db_pandas_one_job(self.job_id)['layer']]
+            self.rout_layers = [each.lower() for each in DMS().get_job_layer_rout_from_dms_db_pandas_one_job(self.job_id)['layer']]
         if layer_info_from_obj == 'job_tgz_file':
-            print('layer_info_from_obj:',layer_info_from_obj)
+            self.drill_layers = list(map(lambda x:x['name'],Information.get_layer_info(self.job, context='board', type=['drill'])))
+            self.rout_layers = list(map(lambda x: x['name'], Information.get_layer_info(self.job, context='board', type=['rout'])))
 
-
+        print('self.drill_layers:', self.drill_layers)
+        print('self.rout_layers:', self.rout_layers)
 
     def out_put(self):
         out_put = []
