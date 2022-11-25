@@ -144,7 +144,7 @@ class TestInputOutputBasicGerber274X:
 @pytest.mark.output
 class TestOutputGerber274X:
     @pytest.mark.parametrize("job_id", GetTestData().get_job_id('Output'))
-    def atest_output_gerber274x(self, job_id, prepare_test_job_clean_g):
+    def test_output_gerber274x(self, job_id, prepare_test_job_clean_g):
         '''本用例测试Gerber274X（包括Excellon2）的导入与导出功能'''
 
         g = RunConfig.driver_g  # 拿到G软件
