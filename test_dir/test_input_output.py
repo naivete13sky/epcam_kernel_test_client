@@ -60,7 +60,7 @@ class TestInputOutputBasicGerber274X:
 
         # ----------------------------------------开始测试输出gerber功能---------------------------------------------------
         customer_para = {}
-        # customer_para['numberFormatR'] = 6
+        customer_para['numberFormatR'] = 6
         MyOutput(temp_path = temp_path, job = job_ep, job_id = job_id,layer_info_from_obj='dms',customer_para = customer_para)
 
 

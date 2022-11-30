@@ -238,7 +238,9 @@ class MyOutput(object):
 
             if drill_layer in rout_layers:
                 Print.print_with_delimiter("我是rout")
+                print(drill_layer)
                 Matrix.change_matrix_row(self.job, drill_layer, 'board', 'rout', drill_layer)
+                # GUI.show_layer(self.job, 'orig', drill_layer)
                 drill_info = Output.save_rout(self.job, step, drill_layer, drill_out_path, number_format_l=2,
                                               number_format_r=4, zeroes=2, unit=0,
                                               tool_unit=1, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
@@ -246,11 +248,13 @@ class MyOutput(object):
             else:
                 Print.print_with_delimiter("我是drill啊")
                 Matrix.change_matrix_row(self.job, drill_layer, 'board', 'drill', drill_layer)
-                # drill_info = Output.save_drill(job_ep, step, drill_layer, drill_out_path)
-                drill_info = BASE.drill2file(self.job, step, drill_layer, drill_out_path, isMetric=False,
-                                             number_format_l=2, number_format_r=4,
-                                             zeroes=2, unit=0, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
-                                             manufacator='', tools_order=[])
+                drill_info = Output.save_drill(self.job, step, drill_layer, drill_out_path, isMetric=False,
+                                               number_format_l=2, number_format_r=4, zeroes=2, unit=0, tool_unit=1,
+                                               x_scale=1, y_scale=1, x_anchor=0, y_anchor=0)
+                # drill_info = BASE.drill2file(self.job, step, drill_layer, drill_out_path, isMetric=False,
+                #                              number_format_l=2, number_format_r=4,
+                #                              zeroes=2, unit=0, x_scale=1, y_scale=1, x_anchor=0, y_anchor=0,
+                #                              manufacator='', tools_order=[])
                 # print("drill_info:",drill_info)
             layer_etime = (int(time.time()))
             layer_time = layer_etime - layer_stime
