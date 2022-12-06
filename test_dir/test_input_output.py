@@ -13,7 +13,7 @@ class TestInputOutputBasicGerber274X:
     def test_input_output_gerber274x(self,job_id,prepare_test_job_clean_g):
         '''
         本用例测试Gerber274X（包括Excellon2）的导入与导出功能
-        fuck
+        fuck1
         fuck
         fuck
         '''
